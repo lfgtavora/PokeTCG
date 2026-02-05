@@ -7,31 +7,35 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.lfgtavora.poketcg.database.model.SetEntity
-import com.lfgtavora.poketcg.database.model.SetWithBoosters
-import com.lfgtavora.poketcg.database.model.SetWithSerie
+import com.lfgtavora.poketcg.database.model.SetWithCardsPreviews
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SetDao {
 
-    @Query("SELECT id, name, releaseDate, logo, card_count_total FROM sets ORDER BY releaseDate DESC LIMIT :itemsPerPage OFFSET :page * :itemsPerPage")
+    @Query("SELECT * FROM sets ORDER BY releaseDate DESC")
+    fun pagingSource(): PagingSource<Int, SetEntity>
+
+    @Query("SELECT * FROM sets ORDER BY releaseDate DESC LIMIT :itemsPerPage OFFSET ((:page - 1) * :itemsPerPage)")
     fun getAll(
         page: Int,
-        itemsPerPage: Int,
-        orderBy: String? = "DESC",
-        field: String? = "releaseDate"
+        itemsPerPage: Int
     ): Flow<List<SetEntity>>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMany(sets: List<SetEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(set: SetEntity)
+
+    @Query("SELECT * FROM sets WHERE id = :id")
+    fun getById(id: String): Flow<SetEntity>
+
     @Transaction
-    @Query("SELECT * FROM sets ORDER BY releaseDate DESC")
-    fun getAllWithSeriePaginated(): PagingSource<Int, SetWithSerie>
+    @Query("SELECT * FROM sets WHERE id = :id")
+    fun getSetWithCards(id: String): Flow<SetWithCardsPreviews?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMany(sets: List<SetEntity>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(set: SetEntity)
-
-    fun getAllSets(): Flow<List<SetEntity>>
+    @Query("DELETE FROM sets")
+    suspend fun clearAll()
 
 }

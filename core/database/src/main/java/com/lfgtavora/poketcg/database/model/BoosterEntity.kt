@@ -2,6 +2,7 @@ package com.lfgtavora.poketcg.database.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -12,7 +13,11 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["setId"],
         )
+    ],
+    indices = [
+        Index(value = ["setId"])
     ]
+
 )
 data class BoosterEntity(
     @PrimaryKey

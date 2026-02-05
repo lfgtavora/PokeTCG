@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -22,8 +23,14 @@ dependencyResolutionManagement {
 rootProject.name = "PokeTCG"
 include(":app")
 include(":core:ui")
-include(":feature:home")
 include(":core:network")
 include(":core:database")
 include(":core:model")
 include(":core:data")
+include(":feature:home:api")
+include(":feature:home:impl")
+include(":core:navigation")
+include(":core:designsystem")
+include(":feature:setdetail")
+include(":feature:sets:api")
+include(":feature:sets:impl")

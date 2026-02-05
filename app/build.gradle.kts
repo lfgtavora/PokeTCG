@@ -1,9 +1,9 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.poketcg.hilt)
+    alias(libs.plugins.poketcg.android.application)
+    alias(libs.plugins.poketcg.android.application.compose)
+    id("org.jetbrains.kotlin.plugin.serialization")
+
 }
 
 android {
@@ -31,13 +31,6 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
     }
@@ -45,6 +38,12 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
+    implementation(project(":core:navigation"))
+    implementation(project(":feature:home:api"))
+    implementation(project(":feature:home:impl"))
+    implementation(project(":feature:sets:api"))
+    implementation(project(":feature:sets:impl"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -57,12 +56,21 @@ dependencies {
     implementation(libs.compose.material.icons)
     implementation(libs.androidx.splashscreen)
     implementation(libs.hilt.android)
+
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.lifecycle.viewModel.navigation3)
+
     ksp(libs.hilt.compiler)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

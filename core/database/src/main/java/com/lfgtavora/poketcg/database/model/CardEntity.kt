@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.lfgtavora.poketcg.model.CardPreview
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "cards",
@@ -18,76 +20,93 @@ import androidx.room.PrimaryKey
     ],
     indices = [
         Index(value = ["setId"]),
-        Index(value = ["category"])
+        Index(value = ["supertype"])
     ]
 )
 data class CardEntity(
     @PrimaryKey
     val id: String,
-    val localId: String,
     val name: String,
-    val image: String?,
-    val category: String,
-    val illustrator: String?,
-    val rarity: String?,
-    val updated: String?,
+    val supertype: String,
+    val subtypes: List<String>? = null,
+    val number: String, // era localId
+    val artist: String? = null,
+    val rarity: String? = null,
+    val flavorText: String? = null,
+    val nationalPokedexNumbers: List<Int>? = null,
+    val imageSmall: String? = null,
+    val imageLarge: String? = null,
     val setId: String,
-    @Embedded(prefix = "variant_")
-    val variants: VariantData?,
 
     /**
      * Pokemon Specific Properties
      */
-    val hp: Int? = null,
+    val hp: String? = null,
     val types: List<String>? = null,
-    val evolveFrom: String? = null,
-    val description: String? = null,
+    val evolvesFrom: String? = null,
+    val evolvesTo: List<String>? = null,
+    val rules: List<String>? = null,
+    val retreatCost: List<String>? = null,
+    val convertedRetreatCost: Int? = null,
     val level: String? = null,
-    val stage: String? = null,
-    val suffix: String? = null,
     val regulationMark: String? = null,
-    val retreat: Int? = null,
-    val dexId: List<Int>? = null,
     val attacks: List<AttackData>? = null,
     val weaknesses: List<WeaknessData>? = null,
     val resistances: List<ResistanceData>? = null,
-    @Embedded(prefix = "item_")
-    val item: ItemData? = null,
+    val abilities: List<AbilityData>? = null,
+    val ancientTrait: AncientTraitData? = null,
 
     /**
-     * Trainer / Energy Specific Properties
+     * Legalities
      */
-    val effect: String? = null,
-    val trainerType: String? = null,
-    val energyType: String? = null
-
+    @Embedded(prefix = "legal_")
+    val legalities: Legalities? = null
 )
 
-data class ItemData(
-    val name: String,
-    val effect: String
+@Serializable
+data class Legalities(
+    val standard: String? = null,
+    val expanded: String? = null,
+    val unlimited: String? = null
 )
 
-data class VariantData(
-    val normal: Boolean,
-    val reverse: Boolean,
-    val holo: Boolean,
-    val firstEdition: Boolean
-)
-
+@Serializable
 data class AttackData(
     val name: String,
     val cost: List<String>?,
-    val effect: String?,
-    val damage: String?
+    val text: String?,
+    val damage: String?,
+    val convertedEnergyCost: Int?
 )
 
+@Serializable
 data class WeaknessData(
     val type: String,
     val value: String
 )
 
+@Serializable
 data class ResistanceData(
     val type: String,
     val value: String
+)
+
+@Serializable
+data class AbilityData(
+    val name: String,
+    val text: String,
+    val type: String
+)
+
+@Serializable
+data class AncientTraitData(
+    val name: String,
+    val text: String
+)
+
+fun CardEntity.asCardPreview() = CardPreview(
+    id = id,
+    name = name,
+    image = imageSmall,
+    setId = setId
 )

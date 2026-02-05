@@ -4,25 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
+import com.lfgtavora.poketcg.core.navigation.Navigator
+import com.lfgtavora.poketcg.core.navigation.rememberNavigationState
+import com.lfgtavora.poketcg.core.navigation.toEntries
+import com.lfgtavora.poketcg.feature.home.api.HomeNavKey
+import com.lfgtavora.poketcg.feature.home.impl.navigation.homeEntry
+import com.lfgtavora.poketcg.feature.sets.impl.navigation.setsDetailEntry
 import com.lfgtavora.poketcg.ui.theme.PokeTCGTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,45 +36,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @PreviewScreenSizes
 @Composable
 fun PokeTCGApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
-
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
-                )
-            }
-        }
-    ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+    val navigationState = rememberNavigationState(MainScreenKey, setOf(MainScreenKey))
+    val navigator = Navigator(navigationState)
+    val entries = entryProvider {
+        mainScreenEntry(navigator)
+        homeEntry(navigator)
+        setsDetailEntry(navigator)
     }
+    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
+
+    NavDisplay(
+        entries = navigationState.toEntries(entries),
+        sceneStrategy = listDetailStrategy,
+        modifier = Modifier,
+        onBack = { navigator.goBack() },
+    )
+
 }
 
-enum class AppDestinations(
-    val label: String,
-    val icon: ImageVector,
-) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
-}
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

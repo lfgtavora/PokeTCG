@@ -1,68 +1,49 @@
 package com.lfgtavora.poketcg.data.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.lfgtavora.poketcg.data.mediator.SetsRemoteMediator
+import com.lfgtavora.poketcg.database.PokeTcgDatabase
+import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
 import com.lfgtavora.poketcg.database.model.SetEntity
-import com.lfgtavora.poketcg.database.model.asModel
-import com.lfgtavora.poketcg.model.SetData
+import com.lfgtavora.poketcg.database.model.asPreviewModel
+import com.lfgtavora.poketcg.model.SetPreview
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
-import com.lfgtavora.poketcg.network.model.SetBriefResponse
-import com.lfgtavora.poketcg.network.model.SetResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class OfflineFirstSetRepository @Inject constructor(
     private val network: TcgDexNetworkDataSource,
-    private val setDao: SetDao
+    private val setDao: SetDao,
+    private val cardDao: CardDao,
+    private val database: PokeTcgDatabase
 ) : SetRepository {
 
-    override fun getAllSetsPaginated(
-        page: Int,
-        itemsPerPage: Int,
-        orderBy: String?,
-        field: String?
-    ): Flow<List<SetData>> = setDao.getAll(
-        page = page,
-        itemsPerPage = itemsPerPage,
-        orderBy = orderBy,
-        field = field
-    ).map { result ->
-        result.map(SetEntity::asModel)
-    }.onStart {
-        syncSetFromNetwork(
-            page = page,
-            itemsPerPage = itemsPerPage,
-            orderBy = orderBy,
-            field = field
-        )
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getSets(): Flow<PagingData<SetPreview>> = Pager(
+        config = PagingConfig(
+            pageSize = SETS_PER_PAGE,
+            enablePlaceholders = true
+        ),
+        remoteMediator = SetsRemoteMediator(
+            database = database,
+            network = network
+        ),
+        pagingSourceFactory = { setDao.pagingSource() }
+    ).flow.map { pagingData ->
+        pagingData.map(SetEntity::asPreviewModel)
     }
 
-    override fun getSet(id: String): Flow<SetResponse?> {
-        TODO("Not yet implemented")
+    override fun getSet(id: String): Flow<SetPreview> {
+        return setDao.getById(id).map { it.asPreviewModel() }
     }
 
-    private suspend fun syncSetFromNetwork(
-        page: Int,
-        itemsPerPage: Int,
-        orderBy: String?,
-        field: String?
-    ) {
-        try {
-            val networkResponse = network.getSets(
-                page = page,
-                itemsPerPage = itemsPerPage,
-                orderBy = orderBy,
-                field = field
-            )?.map(SetBriefResponse::asEntity)
-
-            if (networkResponse != null) {
-                setDao.insert()
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    companion object {
+        private const val SETS_PER_PAGE = 20
     }
-
 }

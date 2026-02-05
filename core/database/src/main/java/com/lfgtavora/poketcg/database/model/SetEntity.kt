@@ -3,51 +3,63 @@ package com.lfgtavora.poketcg.database.model
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.lfgtavora.poketcg.model.SetData
+import com.lfgtavora.poketcg.model.SetModel
+import com.lfgtavora.poketcg.model.SetPreview
 
 @Entity(
     tableName = "sets",
-    foreignKeys = [
-        ForeignKey(
-            entity = SerieEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["serieId"],
-            onDelete = ForeignKey.CASCADE
-        )
+    indices = [
+        Index(value = ["series"])
     ]
 )
 data class SetEntity(
     @PrimaryKey
     val id: String,
     val name: String,
-    val logo: String? = null,
-    val symbol: String? = null,
-    @Embedded(prefix = "card_count_")
-    val cardCount: CardCount,
-    val serieId: String,
-    val tcgOnline: String? = null,
-    val releaseDate: String,
-    @Embedded
-    val legal: Legal,
-)
-
-data class Legal(
-    val standard: Boolean,
-    val expanded: Boolean
-)
-
-data class CardCount(
+    val series: String? = null,
+    val printedTotal: Int,
     val total: Int,
-    val official: Int,
-    val reverse: Int,
-    val holo: Int,
-    val firstEd: Int
-)
+    val ptcgoCode: String? = null,
+    val releaseDate: String,
+    val updatedAt: String? = null,
+    val symbol: String? = null,
+    val logo: String? = null,
+    @Embedded(prefix = "legal_")
+    val legalities: Legalities? = null,
+) {
+    data class Legalities(
+        val standard: String? = null,
+        val expanded: String? = null,
+        val unlimited: String? = null
+    )
+}
 
-fun SetEntity.asModel() = SetData(
-    id = id,
-    name = name,
-    logo = logo,
-    releaseDate = releaseDate
-)
+fun SetEntity.asPreviewModel() =
+    SetPreview(
+        id = id,
+        name = name,
+        logo = logo,
+        releaseDate = releaseDate,
+        totalCards = total
+    )
+
+fun SetEntity.asModel() =
+    SetModel(
+        id = id,
+        name = name,
+        series = series,
+        printedTotal = printedTotal,
+        total = total,
+        ptcgoCode = ptcgoCode,
+        releaseDate = releaseDate,
+        updatedAt = updatedAt,
+        symbol = symbol,
+        logo = logo,
+        legalities = com.lfgtavora.poketcg.model.Legalities(
+            standard = legalities?.standard,
+            expanded = legalities?.expanded,
+            unlimited = legalities?.unlimited
+        )
+    )

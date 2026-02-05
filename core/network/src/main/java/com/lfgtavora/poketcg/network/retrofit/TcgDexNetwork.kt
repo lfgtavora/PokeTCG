@@ -1,7 +1,9 @@
 package com.lfgtavora.poketcg.network.retrofit
 
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
-import com.lfgtavora.poketcg.network.model.SetBriefResponse
+import com.lfgtavora.poketcg.network.model.CardBriefResponse
+import com.lfgtavora.poketcg.network.model.CardDataListResponse
+import com.lfgtavora.poketcg.network.model.SetDataListResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -11,24 +13,32 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private interface TcgDexNetworkApi {
     @GET("sets")
     suspend fun getSets(
-        @Query("pagination:page") page: Int,
-        @Query("pagination:itemsPerPage") itemsPerPage: Int,
-        @Query("sort:order") orderBy: String?,
-        @Query("sort:field") field: String?
-    ): List<SetBriefResponse>
+        @Query("page") page: Int,
+        @Query("pageSize") itemsPerPage: Int,
+        @Query("orderBy") orderBy: String? = null,
+    ): SetDataListResponse
 
     @GET("sets/{id}")
     suspend fun getSet(id: String): SetResponse
 
+    @GET("cards")
+    suspend fun getCards(
+        @Query("q") query: String,
+        @Query("page") page: Int,
+        @Query("pageSize") itemsPerPage: Int,
+        @Query("select") select: String?,
+    ): CardDataListResponse
 
 }
 
-private const val BASE_URL = "https://api.tcgdex.net/v2/en/"
+private const val BASE_URL = "https://api.pokemontcg.io/v2/"
 
+@Singleton
 internal class TcgDexNetwork @Inject constructor(
     networkJson: Json,
     okhttpCallFactory: dagger.Lazy<Call.Factory>,
@@ -39,7 +49,7 @@ internal class TcgDexNetwork @Inject constructor(
             .callFactory { okhttpCallFactory.get().newCall(it) }
             .addConverterFactory(
                 networkJson.asConverterFactory(
-                    "application/json;".toMediaType()
+                    "application/json".toMediaType()
                 )
             )
             .baseUrl(BASE_URL)
@@ -47,25 +57,36 @@ internal class TcgDexNetwork @Inject constructor(
             .create(TcgDexNetworkApi::class.java)
     }
 
-    override suspend fun getAllSets(): List<SetBriefResponse> {
+    override suspend fun getAllSets(): List<SetResponse> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSets(
+    override suspend fun getSetsBrief(
         page: Int,
-        itemsPerPage: Int,
+        pageSize: Int,
         orderBy: String?,
         field: String?
-    ): List<SetBriefResponse> =
-        networkApi.getSets(page, itemsPerPage, orderBy, field)
+    ): List<SetResponse> =
+        networkApi.getSets(page, pageSize, orderBy).data
 
+    override suspend fun getSet(id: String): SetResponse =
+        networkApi.getSet(id)
 
-    override suspend fun getSet(id: String): SetResponse {
+    override suspend fun getCard(id: String): CardBriefResponse {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCard(id: String): Any {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getCards(
+        query: String,
+        page: Int,
+        pageSize: Int,
+        select: String?
+    ): CardDataListResponse =
+        networkApi.getCards(
+            query = query,
+            page = page,
+            itemsPerPage = pageSize,
+            select
+        )
 
 }

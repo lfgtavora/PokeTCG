@@ -11,13 +11,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CardDao {
 
-    @Query("SELECT id, name, image, category, localId FROM cards WHERE setId = :setId")
+    @Query("SELECT * FROM cards WHERE setId = :setId")
     fun getAllCardsFromSet(setId: String): Flow<List<CardEntity>>
 
-    @Query("SELECT id, name, image, category, localId FROM cards WHERE setId = :setId")
-    fun getAllCardsFromSetPaginated(setId: String): PagingSource<Int, CardEntity>
+    @Query("SELECT * FROM cards WHERE setId = :setId")
+    fun getCardsBySet(setId: String): PagingSource<Int, CardEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(cards: List<CardEntity>)
+    suspend fun insertMany(cards: List<CardEntity>)
+
+    @Query("SELECT COUNT(*) FROM cards WHERE setId = :setId")
+    suspend fun getCardsCountBySet(setId: String): Int
 
 }
