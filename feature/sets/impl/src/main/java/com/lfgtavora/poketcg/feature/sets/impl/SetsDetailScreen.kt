@@ -93,9 +93,7 @@ internal fun SetDetailScreen(
                         }
                 },
                 actions = {
-                    IconButton(onClick = { }) {
-                        Text(text = "back")
-                    }
+
                 }
             )
         }
@@ -112,6 +110,7 @@ internal fun SetDetailScreen(
 @Composable
 fun PokeCardList(
     cardsPagingItems: LazyPagingItems<CardPreview>,
+    modifier: Modifier = Modifier,
     onItemClick: (id: String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {

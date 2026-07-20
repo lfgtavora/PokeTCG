@@ -29,7 +29,7 @@ data class CardEntity(
     val name: String,
     val supertype: String,
     val subtypes: List<String>? = null,
-    val number: String, // era localId
+    val number: String,
     val artist: String? = null,
     val rarity: String? = null,
     val flavorText: String? = null,

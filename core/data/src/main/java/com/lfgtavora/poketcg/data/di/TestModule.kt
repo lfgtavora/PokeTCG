@@ -12,6 +12,8 @@ import dagger.hilt.android.components.ViewModelComponent // Ou outro componente
 abstract class CardModule {
     @Binds
     abstract fun bindCardRepository(
-        cardRepository: OfflineFirstCardRepository
+        cardRepository: OfflineFirstCardRepository,
+
     ): CardRepository
+
 }

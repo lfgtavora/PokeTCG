@@ -1,8 +1,8 @@
 package com.lfgtavora.poketcg.network
 
-import com.lfgtavora.poketcg.network.model.CardBriefResponse
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
-import com.lfgtavora.poketcg.network.model.CardResponse
+import com.lfgtavora.poketcg.network.model.CardDataResponse
+import com.lfgtavora.poketcg.network.model.SearchDataResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 
 interface TcgDexNetworkDataSource {
@@ -16,7 +16,7 @@ interface TcgDexNetworkDataSource {
     ): List<SetResponse>
 
     suspend fun getSet(id: String): SetResponse
-    suspend fun getCard(id: String): CardBriefResponse
+    suspend fun getCard(id: String): CardDataResponse
 
     suspend fun getCards(
         query: String,
@@ -25,4 +25,8 @@ interface TcgDexNetworkDataSource {
         select: String? = null,
     ): CardDataListResponse
 
+    suspend fun search(
+        query: String,
+        types: String = "card,set",
+    ): SearchDataResponse
 }

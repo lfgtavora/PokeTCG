@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,8 +28,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lfgtavora.poketcg.core.navigation.Navigator
+import com.lfgtavora.poketcg.feature.card_detail.api.navigateToCardDetail
 import com.lfgtavora.poketcg.feature.home.impl.HomeScreen
+import com.lfgtavora.poketcg.feature.search.api.navigateToSearch
 import com.lfgtavora.poketcg.feature.sets.api.navigateToSetDetail
+import com.lfgtavora.poketcg.search.impl.SearchScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -77,9 +81,11 @@ fun MainScreen(
                         }
                     )
 
-                    AppDestinations.FAVORITES -> {
-                        Text(text = "Favorites")
-                    }
+                    AppDestinations.SEARCH -> SearchScreen(
+                        onCardClick = { cardId ->
+                            rootNavigator.navigateToCardDetail(cardId)
+                        }
+                    )
 
                     AppDestinations.PROFILE -> {
                         Text(text = "Profile")
@@ -100,15 +106,11 @@ fun EntryProviderScope<NavKey>.mainScreenEntry(navigator: Navigator) {
     }
 }
 
-
-
-
-
 enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
+    SEARCH("Search", Icons.Default.Search),
     PROFILE("Profile", Icons.Default.AccountBox),
 }

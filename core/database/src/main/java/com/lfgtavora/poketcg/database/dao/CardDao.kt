@@ -14,7 +14,7 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE setId = :setId")
     fun getAllCardsFromSet(setId: String): Flow<List<CardEntity>>
 
-    @Query("SELECT * FROM cards WHERE setId = :setId")
+    @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY CAST(number AS INTEGER)")
     fun getCardsBySet(setId: String): PagingSource<Int, CardEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -22,5 +22,11 @@ interface CardDao {
 
     @Query("SELECT COUNT(*) FROM cards WHERE setId = :setId")
     suspend fun getCardsCountBySet(setId: String): Int
+
+    @Query("SELECT * FROM cards WHERE id = :id")
+    fun getCardById(id: String): Flow<CardEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(card: CardEntity)
 
 }

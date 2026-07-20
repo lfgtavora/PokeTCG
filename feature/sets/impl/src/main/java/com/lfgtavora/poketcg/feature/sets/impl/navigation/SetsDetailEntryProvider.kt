@@ -6,6 +6,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lfgtavora.poketcg.core.navigation.Navigator
+import com.lfgtavora.poketcg.feature.card_detail.api.CardDetailNavKey
 import com.lfgtavora.poketcg.feature.sets.api.SetsDetailNavKey
 import com.lfgtavora.poketcg.feature.sets.impl.SetsDetailsScreen
 import com.lfgtavora.poketcg.feature.sets.impl.SetsDetailsViewModel
@@ -13,7 +14,7 @@ import com.lfgtavora.poketcg.feature.sets.impl.SetsDetailsViewModel
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun EntryProviderScope<NavKey>.setsDetailEntry(navigator: Navigator) {
     entry<SetsDetailNavKey>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = ListDetailSceneStrategy.listPane(),
     ) { key ->
         val id = key.id
         val viewModel = hiltViewModel<SetsDetailsViewModel, SetsDetailsViewModel.Factory>(
@@ -24,6 +25,7 @@ fun EntryProviderScope<NavKey>.setsDetailEntry(navigator: Navigator) {
 
         SetsDetailsScreen(
             viewModel = viewModel,
+            onItemClick = { cardId -> navigator.navigate(CardDetailNavKey(cardId)) },
             onBack = { navigator.goBack() }
         )
     }

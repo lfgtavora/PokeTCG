@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":core:data"))
     implementation(project(":feature:sets:api"))
+    implementation(project(":feature:card-detail:api"))
 
     implementation(libs.androidx.compose.material3.adaptive.navigation3)
 

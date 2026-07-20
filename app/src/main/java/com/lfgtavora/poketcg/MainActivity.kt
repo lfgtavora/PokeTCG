@@ -17,9 +17,11 @@ import androidx.navigation3.ui.NavDisplay
 import com.lfgtavora.poketcg.core.navigation.Navigator
 import com.lfgtavora.poketcg.core.navigation.rememberNavigationState
 import com.lfgtavora.poketcg.core.navigation.toEntries
+import com.lfgtavora.poketcg.feature.card_detail.impl.cardDetailEntry
 import com.lfgtavora.poketcg.feature.home.api.HomeNavKey
 import com.lfgtavora.poketcg.feature.home.impl.navigation.homeEntry
 import com.lfgtavora.poketcg.feature.sets.impl.navigation.setsDetailEntry
+import com.lfgtavora.poketcg.search.impl.navigation.searchEntry
 import com.lfgtavora.poketcg.ui.theme.PokeTCGTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,13 +43,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PokeTCGApp() {
     val navigationState = rememberNavigationState(MainScreenKey, setOf(MainScreenKey))
+    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
     val navigator = Navigator(navigationState)
+
     val entries = entryProvider {
         mainScreenEntry(navigator)
         homeEntry(navigator)
         setsDetailEntry(navigator)
+        cardDetailEntry(navigator)
+        searchEntry(navigator)
     }
-    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
     NavDisplay(
         entries = navigationState.toEntries(entries),
@@ -56,22 +61,4 @@ fun PokeTCGApp() {
         onBack = { navigator.goBack() },
     )
 
-}
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PokeTCGTheme {
-        Greeting("Android")
-    }
 }

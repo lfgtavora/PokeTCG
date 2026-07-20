@@ -30,7 +30,7 @@ splashscreen = "1.2.0"
 retrofit = "3.0.0"
 kotlin = "2.3.0"
 ksp = "2.3.4"
-hilt = "2.57.2"
+hilt = "2.58"
 kotlinxSerializationJson = "1.9.0"
 truth = "1.4.4"
 roomGradlePlugin = "2.8.4"
@@ -99,6 +99,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+kotlin-metadata-jvm = { group = "org.jetbrains.kotlin:kotlin-metadata-jvm", name = "kotlin-metadata-jvm", version.ref = "kotlin" }
 
 # Dependencies of the included build-logic
 android-gradleApiPlugin = { group = "com.android.tools.build", name = "gradle-api", version.ref = "agp" }

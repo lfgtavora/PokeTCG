@@ -12,6 +12,11 @@ data class CardDataListResponse(
 )
 
 @Serializable
+data class CardDataResponse(
+    val data: CardResponse
+)
+
+@Serializable
 data class CardResponse(
     val id: String,
     val name: String,

@@ -85,6 +85,13 @@ internal fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxSize()
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+
+                Text(
+                    text = "Sets",
+                    style = MaterialTheme.typography.displaySmall,
+                )
+            }
             items(
                 key = lazyPagingItems.itemKey { it.id },
                 count = lazyPagingItems.itemCount,
@@ -202,11 +209,12 @@ private fun SetCardView(
                             .size(120.dp),
                         onSuccess = {
                             (it.result.image as? BitmapImage)?.bitmap?.let { bitmap ->
-                                val softwareBitmap = if (bitmap.config == Bitmap.Config.HARDWARE) {
-                                    bitmap.copy(Bitmap.Config.ARGB_8888, false)
-                                } else {
-                                    bitmap
-                                }
+                                val softwareBitmap =
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && bitmap.config == Bitmap.Config.HARDWARE) {
+                                        bitmap.copy(Bitmap.Config.ARGB_8888, false)
+                                    } else {
+                                        bitmap
+                                    }
 
                                 softwareBitmap?.let {
                                     paletteState.value = Palette.from(it).generate()
@@ -268,7 +276,7 @@ private fun HomeScreenSuccessPreview() {
     val lazyPagingItems = flowPagingData.collectAsLazyPagingItems()
 
     HomeScreen(
-        lazyPagingItems =lazyPagingItems,
+        lazyPagingItems = lazyPagingItems,
         onSetClick = { },
         previewHandler = AsyncImagePreviewHandler {
             ColorImage(Color.Red.toArgb())
@@ -294,7 +302,7 @@ private fun HomeScreenErrorPreview() {
     val lazyPagingItems = flowPagingData.collectAsLazyPagingItems()
 
     HomeScreen(
-        lazyPagingItems =lazyPagingItems,
+        lazyPagingItems = lazyPagingItems,
         onSetClick = { },
         previewHandler = AsyncImagePreviewHandler {
             ColorImage(Color.Red.toArgb())

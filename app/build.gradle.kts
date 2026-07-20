@@ -43,6 +43,10 @@ dependencies {
     implementation(project(":feature:home:impl"))
     implementation(project(":feature:sets:api"))
     implementation(project(":feature:sets:impl"))
+    implementation(project(":feature:card-detail:api"))
+    implementation(project(":feature:card-detail:impl"))
+    implementation(project(":feature:search:impl"))
+    implementation(project(":feature:search:api"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -61,6 +65,8 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
+
+    //ksp(libs.kotlin.metadata.jvm)
 
     ksp(libs.hilt.compiler)
 

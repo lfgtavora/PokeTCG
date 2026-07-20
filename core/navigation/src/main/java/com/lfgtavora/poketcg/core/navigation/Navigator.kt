@@ -16,6 +16,7 @@
 
 package com.lfgtavora.poketcg.core.navigation
 
+import androidx.compose.runtime.Immutable
 import androidx.navigation3.runtime.NavKey
 import kotlin.apply
 import kotlin.collections.removeLastOrNull
@@ -26,6 +27,7 @@ import kotlin.run
  *
  * @param state - The navigation state that will be updated in response to navigation events.
  */
+@Immutable
 class Navigator(val state: NavigationState) {
 
     /**

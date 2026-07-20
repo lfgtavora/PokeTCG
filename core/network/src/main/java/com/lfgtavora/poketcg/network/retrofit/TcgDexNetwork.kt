@@ -1,8 +1,9 @@
 package com.lfgtavora.poketcg.network.retrofit
 
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
-import com.lfgtavora.poketcg.network.model.CardBriefResponse
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
+import com.lfgtavora.poketcg.network.model.CardDataResponse
+import com.lfgtavora.poketcg.network.model.SearchDataResponse
 import com.lfgtavora.poketcg.network.model.SetDataListResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 import kotlinx.serialization.json.Json
@@ -11,6 +12,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,9 +36,20 @@ private interface TcgDexNetworkApi {
         @Query("select") select: String?,
     ): CardDataListResponse
 
+    @GET("cards/{id}")
+    suspend fun getCard(
+        @Path("id")
+        id: String
+    ): CardDataResponse
+
+    @GET("search")
+    suspend fun search(
+        @Query("query") query: String,
+        @Query("types") types: String,
+    ): SearchDataResponse
 }
 
-private const val BASE_URL = "https://api.pokemontcg.io/v2/"
+private const val BASE_URL = "http://10.0.2.2:8080/v2/"
 
 @Singleton
 internal class TcgDexNetwork @Inject constructor(
@@ -72,9 +85,8 @@ internal class TcgDexNetwork @Inject constructor(
     override suspend fun getSet(id: String): SetResponse =
         networkApi.getSet(id)
 
-    override suspend fun getCard(id: String): CardBriefResponse {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getCard(id: String): CardDataResponse =
+        networkApi.getCard(id)
 
     override suspend fun getCards(
         query: String,
@@ -89,4 +101,9 @@ internal class TcgDexNetwork @Inject constructor(
             select
         )
 
+    override suspend fun search(
+        query: String,
+        types: String,
+    ): SearchDataResponse =
+        networkApi.search(query = query, types = types)
 }
