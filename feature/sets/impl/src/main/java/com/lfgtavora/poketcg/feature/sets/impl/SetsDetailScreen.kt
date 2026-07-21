@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -144,6 +145,8 @@ fun PokeCardList(
     onItemClick: (id: String) -> Unit
 ) {
     var selectedCard by remember { mutableStateOf<CardPreview?>(null) }
+    val gridState = rememberLazyGridState()
+
     val gridBlur by animateDpAsState(
         targetValue = if (selectedCard != null) 20.dp else 0.dp,
         label = "quickLookBlur",
@@ -156,6 +159,7 @@ fun PokeCardList(
     SharedTransitionLayout(modifier = modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyVerticalGrid(
+                state = gridState,
                 columns = GridCells.Fixed(4),
                 contentPadding = PaddingValues(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -177,8 +181,7 @@ fun PokeCardList(
                             visible = card.id != selectedCard?.id,
                             enter = fadeIn() + scaleIn(),
                             exit = fadeOut() + scaleOut(),
-                            modifier = Modifier.animateItem(),
-                        ) {
+                         ) {
                             Box(
                                 modifier = Modifier
                                     .sharedBounds(

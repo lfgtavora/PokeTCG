@@ -21,7 +21,8 @@ class GetCardsPreviewFromSetUseCase @Inject constructor(
             setId = setId,
             pageSize = pageSize,
             query = query,
-            select = select
+            select = select,
+            orderBy = "number"
         )
     }
 

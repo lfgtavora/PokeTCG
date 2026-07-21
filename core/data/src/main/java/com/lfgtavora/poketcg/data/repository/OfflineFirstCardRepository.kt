@@ -31,14 +31,21 @@ class OfflineFirstCardRepository @Inject constructor(
         setId: String,
         pageSize: Int,
         query: String,
-        select: String
+        select: String,
+        orderBy: String?
     ): Flow<PagingData<CardPreview>> {
         return Pager(
-            config = PagingConfig(pageSize),
+            config = PagingConfig(
+                pageSize = pageSize,
+                initialLoadSize = pageSize,
+                prefetchDistance = pageSize / 2,
+                enablePlaceholders = false,
+            ),
             remoteMediator = CardsRemoteMediator(
                 setId = setId,
                 query = query,
                 select = select,
+                orderBy = orderBy,
                 cardDao = cardDao,
                 network = remoteDataSource
             ),

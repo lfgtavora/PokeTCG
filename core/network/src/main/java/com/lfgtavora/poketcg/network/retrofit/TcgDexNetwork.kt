@@ -1,5 +1,6 @@
 package com.lfgtavora.poketcg.network.retrofit
 
+import androidx.room.Index
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse
@@ -34,6 +35,7 @@ private interface TcgDexNetworkApi {
         @Query("page") page: Int,
         @Query("pageSize") itemsPerPage: Int,
         @Query("select") select: String?,
+        @Query("orderBy") orderBy: String?,
     ): CardDataListResponse
 
     @GET("cards/{id}")
@@ -92,13 +94,15 @@ internal class TcgDexNetwork @Inject constructor(
         query: String,
         page: Int,
         pageSize: Int,
-        select: String?
+        select: String?,
+        orderBy: String?
     ): CardDataListResponse =
         networkApi.getCards(
             query = query,
             page = page,
             itemsPerPage = pageSize,
-            select
+            select= select,
+            orderBy = orderBy
         )
 
     override suspend fun search(

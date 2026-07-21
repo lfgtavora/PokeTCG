@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.lfgtavora.poketcg.database.model.CardEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -23,10 +25,26 @@ interface CardDao {
     @Query("SELECT COUNT(*) FROM cards WHERE setId = :setId")
     suspend fun getCardsCountBySet(setId: String): Int
 
+    @Query("DELETE FROM cards WHERE setId = :setId")
+    suspend fun clearCardsBySet(setId: String)
+
     @Query("SELECT * FROM cards WHERE id = :id")
     fun getCardById(id: String): Flow<CardEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(card: CardEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(card: CardEntity): Long
 
+    @Update
+    suspend fun update(card: CardEntity)
+
+    /**
+     * Prefer update-in-place over REPLACE so rowid (and sort ties) stay stable
+     * when card detail refresh invalidates the set paging source.
+     */
+    @Transaction
+    suspend fun upsert(card: CardEntity) {
+        if (insert(card) == -1L) {
+            update(card)
+        }
+    }
 }

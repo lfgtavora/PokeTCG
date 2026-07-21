@@ -12,6 +12,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -38,16 +39,8 @@ class SetsDetailsViewModel @AssistedInject constructor(
                 initialValue = SetUiState.Loading
             )
 
-    val cardsPagingData: StateFlow<PagingData<CardPreview>> =
-        getCardsPreviewFromSetUseCase(
-            setId
-        ).cachedIn(
-            viewModelScope
-        ).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = PagingData.empty()
-        )
+    val cardsPagingData: Flow<PagingData<CardPreview>> =
+        getCardsPreviewFromSetUseCase(setId).cachedIn(viewModelScope)
 
 
     @AssistedFactory

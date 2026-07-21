@@ -11,7 +11,8 @@ interface CardRepository {
         setId: String,
         pageSize: Int,
         query: String,
-        select: String
+        select: String,
+        orderBy: String? = null
     ): Flow<PagingData<CardPreview>>
 
     fun getCard(id: String): Flow<CardEntity?>

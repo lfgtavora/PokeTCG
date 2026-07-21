@@ -1,8 +1,11 @@
 package com.lfgtavora.poketcg.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.lfgtavora.poketcg.database.converter.CardTypeConverters
 import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
@@ -21,7 +24,7 @@ import com.lfgtavora.poketcg.database.model.SetRemoteKeysEntity
     exportSchema = true
 )
 @TypeConverters(CardTypeConverters::class)
-abstract class PokeTcgDatabase: RoomDatabase() {
+abstract class PokeTcgDatabase : RoomDatabase() {
     abstract fun setDao(): SetDao
     abstract fun cardDao(): CardDao
     abstract fun setRemoteKeyDao(): SetRemoteKeyDao

@@ -23,6 +23,7 @@ interface TcgDexNetworkDataSource {
         page: Int,
         pageSize: Int,
         select: String? = null,
+        orderBy: String? = null
     ): CardDataListResponse
 
     suspend fun search(
