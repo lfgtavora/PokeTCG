@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asEntity
 import com.lfgtavora.poketcg.data.mediator.CardsRemoteMediator
 import com.lfgtavora.poketcg.database.dao.CardDao
@@ -13,7 +14,7 @@ import com.lfgtavora.poketcg.database.model.CardEntity
 import com.lfgtavora.poketcg.database.model.asCardPreview
 import com.lfgtavora.poketcg.model.CardPreview
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,7 @@ class OfflineFirstCardRepository @Inject constructor(
     val remoteDataSource: TcgDexNetworkDataSource,
     val cardDao: CardDao,
     val setDao: SetDao,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CardRepository {
 
     @OptIn(ExperimentalPagingApi::class)
@@ -58,7 +60,7 @@ class OfflineFirstCardRepository @Inject constructor(
     override fun getCard(id: String): Flow<CardEntity?> =
         cardDao.getCardById(id).onStart {
             refreshCard(id)
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     private suspend fun refreshCard(id: String) =
         runCatching {
