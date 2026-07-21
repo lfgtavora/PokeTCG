@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -166,6 +167,7 @@ fun PokeCardList(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxSize()
+                    .testTag("set_cards_grid")
                     .blur(
                         radius = gridBlur,
                         edgeTreatment = BlurredEdgeTreatment.Unbounded,

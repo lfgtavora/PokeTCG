@@ -29,6 +29,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,7 +84,9 @@ internal fun HomeScreen(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("home_sets_grid")
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
 
@@ -99,6 +102,7 @@ internal fun HomeScreen(
             ) { index ->
                 lazyPagingItems[index]?.let { setData ->
                     SetCardView(
+                        id = setData.id,
                         name = setData.name,
                         imageUrl = setData.logo,
                         totalCards = setData.totalCards,
@@ -166,6 +170,7 @@ internal fun HomeScreen(
 @Composable
 private fun SetCardView(
     modifier: Modifier = Modifier,
+    id: String,
     name: String,
     imageUrl: String?,
     totalCards: Int? = null,
@@ -181,7 +186,9 @@ private fun SetCardView(
         palette?.let { Color(it.getLightVibrantColor(android.graphics.Color.WHITE)) } ?: Color.White
 
     Card(
-        modifier = modifier.height(200.dp),
+        modifier = modifier
+            .height(200.dp)
+            .testTag("set_card_$id"),
         onClick = onClick,
     ) {
         Box(
@@ -258,6 +265,7 @@ private fun SetCardViewPreview() {
         ColorImage(Color.Red.toArgb())
     }
     SetCardView(
+        id = fakeSetWithVeryLongName.id,
         name = fakeSetWithVeryLongName.name,
         imageUrl = fakeSetWithVeryLongName.logo,
         totalCards = fakeSetWithVeryLongName.totalCards,
