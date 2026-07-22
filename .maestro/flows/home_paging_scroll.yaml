@@ -1,0 +1,21 @@
+appId: com.lfgtavora.poketcg
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "home_sets_grid"
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      id: "set_card_.*"
+      index: 0
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: "set_card_.*"
+      index: 4
+    direction: DOWN
+    timeout: 30000
+- assertVisible:
+    id: "set_card_.*"
+    index: 0

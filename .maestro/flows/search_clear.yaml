@@ -1,0 +1,20 @@
+appId: com.lfgtavora.poketcg
+---
+- launchApp
+- tapOn: "Search"
+- tapOn:
+    id: "search_field"
+- inputText: "Pikachu"
+- extendedWaitUntil:
+    visible:
+      id: "search_result_.*"
+      index: 0
+    timeout: 30000
+- tapOn: "Clear search"
+- assertNotVisible:
+    id: "search_result_.*"
+- tapOn:
+    id: "search_field"
+- inputText: "Pi"
+- assertNotVisible:
+    id: "search_result_.*"

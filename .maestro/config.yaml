@@ -1,0 +1,8 @@
+appId: com.lfgtavora.poketcg
+name: PokeTCG
+flows:
+  - "smoke/*"
+  - "flows/*"
+excludeTags:
+  - wip
+testOutputDir: ../build/maestro

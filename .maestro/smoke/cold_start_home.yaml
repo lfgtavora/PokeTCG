@@ -1,0 +1,16 @@
+appId: com.lfgtavora.poketcg
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: "home_sets_grid"
+    timeout: 30000
+- assertVisible: "Sets"
+- extendedWaitUntil:
+    visible:
+      id: "set_card_.*"
+      index: 0
+    timeout: 30000

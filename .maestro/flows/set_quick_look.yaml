@@ -1,0 +1,37 @@
+appId: com.lfgtavora.poketcg
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "set_card_.*"
+      index: 0
+    timeout: 30000
+- tapOn:
+    id: "set_card_.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "card_preview_.*"
+      index: 0
+    timeout: 30000
+- longPressOn:
+    id: "card_preview_.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "card_quick_look"
+    timeout: 10000
+- pressKey: Back
+- assertVisible:
+    id: "set_cards_grid"
+- assertNotVisible:
+    id: "card_quick_look"
+- assertNotVisible:
+    id: "card_detail"
+- tapOn:
+    id: "card_preview_.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "card_detail"
+    timeout: 30000
