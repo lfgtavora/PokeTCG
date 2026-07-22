@@ -9,6 +9,8 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation3.runtime.NavKey
@@ -57,7 +59,9 @@ fun PokeTCGApp() {
     NavDisplay(
         entries = navigationState.toEntries(entries),
         sceneStrategy = listDetailStrategy,
-        modifier = Modifier,
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        },
         onBack = { navigator.goBack() },
     )
 

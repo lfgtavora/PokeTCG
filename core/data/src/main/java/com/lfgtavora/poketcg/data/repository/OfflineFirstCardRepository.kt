@@ -39,8 +39,7 @@ class OfflineFirstCardRepository @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = pageSize,
-                initialLoadSize = pageSize,
-                prefetchDistance = pageSize / 2,
+                prefetchDistance = pageSize * 2,
                 enablePlaceholders = false,
             ),
             remoteMediator = CardsRemoteMediator(

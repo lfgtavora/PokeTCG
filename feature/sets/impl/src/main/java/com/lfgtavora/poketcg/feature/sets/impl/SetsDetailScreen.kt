@@ -2,15 +2,12 @@ package com.lfgtavora.poketcg.feature.sets.impl
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -71,6 +69,7 @@ import com.lfgtavora.poketcg.ui.PokecardCard
 
 private val QuickLookShape = RoundedCornerShape(12.dp)
 private const val CardAspectRatio = 2.5f / 3.5f
+private val GridHorizontalPadding = 8.dp
 
 @Composable
 internal fun SetsDetailsScreen(
@@ -109,32 +108,39 @@ internal fun SetDetailScreen(
                     }
                 },
                 title = {
-                    if (setUiState is SetUiState.Success)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
+                    // Keep a stable title height so Scaffold contentPadding doesn't jump
+                    // when set metadata arrives after the first frame.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (setUiState is SetUiState.Success) {
                             AsyncImage(
                                 model = setUiState.set.logo,
                                 contentDescription = setUiState.set.name,
                                 modifier = Modifier.widthIn(max = 160.dp)
                             )
                         }
+                    }
                 },
                 actions = {
                 }
             )
         }
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            PokeCardList(
-                cardsPagingItems = cardsPagingItems,
-                onItemClick = onItemClick
-            )
-        }
+    ) { innerPadding ->
+        PokeCardList(
+            cardsPagingItems = cardsPagingItems,
+            onItemClick = onItemClick,
+            contentPadding = PaddingValues(
+                start = GridHorizontalPadding,
+                top = innerPadding.calculateTopPadding(),
+                end = GridHorizontalPadding,
+                bottom = innerPadding.calculateBottomPadding(),
+            ),
+        )
     }
 }
 
@@ -143,10 +149,12 @@ internal fun SetDetailScreen(
 fun PokeCardList(
     cardsPagingItems: LazyPagingItems<CardPreview>,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(8.dp),
     onItemClick: (id: String) -> Unit
 ) {
     var selectedCard by remember { mutableStateOf<CardPreview?>(null) }
     val gridState = rememberLazyGridState()
+    val isRefreshLoading = cardsPagingItems.loadState.refresh is LoadState.Loading
 
     val gridBlur by animateDpAsState(
         targetValue = if (selectedCard != null) 20.dp else 0.dp,
@@ -162,9 +170,10 @@ fun PokeCardList(
             LazyVerticalGrid(
                 state = gridState,
                 columns = GridCells.Fixed(4),
-                contentPadding = PaddingValues(8.dp),
+                contentPadding = contentPadding,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                userScrollEnabled = !isRefreshLoading || cardsPagingItems.itemCount > 0,
                 modifier = Modifier
                     .fillMaxSize()
                     .testTag("set_cards_grid")
@@ -176,83 +185,76 @@ fun PokeCardList(
                 items(
                     key = cardsPagingItems.itemKey { it.id },
                     count = cardsPagingItems.itemCount,
-                    contentType = { cardsPagingItems.itemContentType { "pokecard_preview" } }
+                    contentType = cardsPagingItems.itemContentType { "pokecard_preview" }
                 ) { index ->
-                    cardsPagingItems[index]?.let { card ->
-                        AnimatedVisibility(
-                            visible = card.id != selectedCard?.id,
-                            enter = fadeIn() + scaleIn(),
-                            exit = fadeOut() + scaleOut(),
-                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .sharedBounds(
-                                        sharedContentState = rememberSharedContentState(
-                                            key = "card-${card.id}-bounds"
-                                        ),
-                                        animatedVisibilityScope = this
-                                    )
-                            ) {
-                                PokecardCard(
-                                    id = card.id,
-                                    name = card.name,
-                                    imageUrl = card.image,
-                                    onClick = onItemClick,
-                                    onLongClick = { selectedCard = card },
-                                    modifier = Modifier.sharedElement(
-                                        sharedContentState = rememberSharedContentState(
-                                            key = "card-${card.id}"
-                                        ),
-                                        animatedVisibilityScope = this@AnimatedVisibility,
-                                    ),
-                                )
-                            }
-                        }
+                    val card = cardsPagingItems[index]
+                    if (card == null) {
+                        CardPlaceholder()
+                        return@items
+                    }
+
+                    val isSelected = card.id == selectedCard?.id
+                    Box(modifier = Modifier.alpha(if (isSelected) 0f else 1f)) {
+                        PokecardCard(
+                            id = card.id,
+                            name = card.name,
+                            imageUrl = card.image,
+                            onClick = onItemClick,
+                            onLongClick = { selectedCard = card },
+                            modifier = Modifier.sharedElementWithCallerManagedVisibility(
+                                sharedContentState = rememberSharedContentState(
+                                    key = "card-${card.id}"
+                                ),
+                                visible = !isSelected,
+                            ),
+                        )
                     }
                 }
 
-                when (val state = cardsPagingItems.loadState.append) {
-                    is LoadState.Loading -> {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        }
-                    }
-
-                    is LoadState.Error -> {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Button(
-                                onClick = { cardsPagingItems.retry() },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = "Try again")
-                            }
-                        }
-                    }
-
-                    else -> {
-                        if (state.endOfPaginationReached && cardsPagingItems.itemCount > 0) {
+                if (!isRefreshLoading) {
+                    when (val state = cardsPagingItems.loadState.append) {
+                        is LoadState.Loading -> {
                             item(span = { GridItemSpan(maxLineSpan) }) {
-                                Text(
-                                    text = "Você chegou ao fim da lista",
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(16.dp),
-                                    textAlign = TextAlign.Center
-                                )
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+
+                        is LoadState.Error -> {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Button(
+                                    onClick = { cardsPagingItems.retry() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "Try again")
+                                }
+                            }
+                        }
+
+                        else -> {
+                            if (state.endOfPaginationReached && cardsPagingItems.itemCount > 0) {
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    Text(
+                                        text = "Você chegou ao fim da lista",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
 
-            if (cardsPagingItems.loadState.refresh is LoadState.Loading && cardsPagingItems.itemCount == 0) {
+            if (isRefreshLoading && cardsPagingItems.itemCount == 0) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
@@ -272,6 +274,17 @@ fun PokeCardList(
             )
         }
     }
+}
+
+@Composable
+private fun CardPlaceholder() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(CardAspectRatio)
+            .clip(QuickLookShape)
+            .background(Color.LightGray.copy(alpha = 0.35f))
+    )
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -306,6 +319,7 @@ private fun SharedTransitionScope.CardQuickLookOverlay(
                     modifier = Modifier
                         .padding(horizontal = 32.dp)
                         .fillMaxWidth(0.85f)
+                        .testTag("card_quick_look")
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(
                                 key = "card-${targetCard.id}-bounds"

@@ -117,6 +117,7 @@ private fun SearchScreen(
                         ) { item ->
                             when (item) {
                                 is SearchResultItem.Card -> CardItem(
+                                    id = item.id,
                                     name = item.name,
                                     image = item.image,
                                     setName = item.set?.name,
@@ -174,6 +175,7 @@ fun SetItem(
 @Composable
 fun CardItem(
     modifier: Modifier = Modifier,
+    id: String,
     name: String,
     image: String?,
     setName: String? = null,
@@ -182,6 +184,7 @@ fun CardItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .testTag("search_result_$id")
             .clickable(onClick = onClick)
             .padding(8.dp),
     ) {
