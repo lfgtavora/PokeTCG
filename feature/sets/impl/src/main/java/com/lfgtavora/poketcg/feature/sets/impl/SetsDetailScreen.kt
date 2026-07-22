@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -121,12 +122,18 @@ internal fun SetDetailScreen(
                             AsyncImage(
                                 model = setUiState.set.logo,
                                 contentDescription = setUiState.set.name,
-                                modifier = Modifier.widthIn(max = 160.dp)
+                                modifier = Modifier.widthIn(max = 100.dp)
                             )
                         }
                     }
                 },
                 actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "information"
+                        )
+                    }
                 }
             )
         }
