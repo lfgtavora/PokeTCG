@@ -1,6 +1,8 @@
 package com.lfgtavora.poketcg.data.di
 
+import com.lfgtavora.poketcg.data.repository.CardRepository
 import com.lfgtavora.poketcg.data.repository.DefaultSearchRepository
+import com.lfgtavora.poketcg.data.repository.OfflineFirstCardRepository
 import com.lfgtavora.poketcg.data.repository.OfflineFirstSetRepository
 import com.lfgtavora.poketcg.data.repository.SearchRepository
 import com.lfgtavora.poketcg.data.repository.SetRepository
@@ -22,4 +24,10 @@ abstract class DataModule {
     abstract fun bindSearchRepository(
         searchRepository: DefaultSearchRepository
     ): SearchRepository
+
+    @Binds
+    abstract fun bindCardRepository(
+        cardRepository: OfflineFirstCardRepository,
+    ): CardRepository
+
 }
