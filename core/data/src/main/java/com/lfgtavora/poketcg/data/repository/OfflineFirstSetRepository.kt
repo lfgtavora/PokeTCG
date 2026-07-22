@@ -6,7 +6,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.lfgtavora.poketcg.data.di.IoDispatcher
+import androidx.room.withTransaction
 import com.lfgtavora.poketcg.data.mediator.SetsRemoteMediator
+import com.lfgtavora.poketcg.data.mediator.TransactionRunner
 import com.lfgtavora.poketcg.database.PokeTcgDatabase
 import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
@@ -35,8 +37,12 @@ class OfflineFirstSetRepository @Inject constructor(
             enablePlaceholders = true
         ),
         remoteMediator = SetsRemoteMediator(
-            database = database,
-            network = network
+            setDao = setDao,
+            setRemoteKeyDao = database.setRemoteKeyDao(),
+            network = network,
+            transactionRunner = { block ->
+                database.withTransaction { block() }
+            },
         ),
         pagingSourceFactory = { setDao.pagingSource() }
     ).flow.map { pagingData ->

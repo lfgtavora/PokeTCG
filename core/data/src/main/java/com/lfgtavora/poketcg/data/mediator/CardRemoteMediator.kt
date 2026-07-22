@@ -22,12 +22,7 @@ internal class CardsRemoteMediator(
 ) : RemoteMediator<Int, CardEntity>() {
 
     override suspend fun initialize(): InitializeAction {
-        val cachedCount = cardDao.getCardsCountBySet(setId)
-        return if (cachedCount > 0) {
-            InitializeAction.SKIP_INITIAL_REFRESH
-        } else {
-            InitializeAction.LAUNCH_INITIAL_REFRESH
-        }
+        return cardsInitializeAction(cardDao.getCardsCountBySet(setId))
     }
 
     override suspend fun load(
@@ -36,13 +31,14 @@ internal class CardsRemoteMediator(
     ): MediatorResult {
         try {
             val page = when (loadType) {
-                LoadType.REFRESH -> 1
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> {
-                    val count = cardDao.getCardsCountBySet(setId)
-                    if (count == 0) 1 else (count / state.config.pageSize) + 1
-                }
-            }
+                LoadType.PREPEND -> null
+                LoadType.REFRESH -> cardsPage(LoadType.REFRESH, cachedCount = 0, pageSize = state.config.pageSize)
+                LoadType.APPEND -> cardsPage(
+                    loadType = LoadType.APPEND,
+                    cachedCount = cardDao.getCardsCountBySet(setId),
+                    pageSize = state.config.pageSize,
+                )
+            } ?: return MediatorResult.Success(endOfPaginationReached = true)
 
             val response = network.getCards(
                 query = query,
@@ -55,8 +51,11 @@ internal class CardsRemoteMediator(
             cardDao.insertMany(response.data.map(CardResponse::asEntity))
 
             val currentItemsCount = cardDao.getCardsCountBySet(setId)
-            val endOfPaginationReached = response.data.isEmpty() ||
-                currentItemsCount >= response.totalCount
+            val endOfPaginationReached = cardsEndOfPagination(
+                empty = response.data.isEmpty(),
+                currentCount = currentItemsCount,
+                totalCount = response.totalCount,
+            )
 
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
 
