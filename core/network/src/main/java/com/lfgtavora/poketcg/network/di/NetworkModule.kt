@@ -1,9 +1,8 @@
 package com.lfgtavora.poketcg.network.di
 
-import android.R.attr.level
+import com.lfgtavora.poketcg.network.BuildConfig
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import com.lfgtavora.poketcg.network.retrofit.TcgDexNetwork
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +11,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -28,28 +28,24 @@ internal object NetworkModule {
     @Singleton
     fun okHttpCallFactory(): Call.Factory {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
 
         return OkHttpClient.Builder()
-            .connectTimeout(1, java.util.concurrent.TimeUnit.MINUTES)
-            .readTimeout(1, java.util.concurrent.TimeUnit.MINUTES)
-            .writeTimeout(1, java.util.concurrent.TimeUnit.MINUTES)
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(1, TimeUnit.MINUTES)
+            .writeTimeout(1, TimeUnit.MINUTES)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .header("X-Api-Key", "d5676117-c38c-48db-95a8-76940e8799d2")
-                    .build()
-                chain.proceed(request)
-            }
             .build()
     }
-
 
     @Provides
     @Singleton
     fun bindTcgDexNetworkDataSource(
-        impl: TcgDexNetwork // A implementação real da sua rede
+        impl: TcgDexNetwork
     ): TcgDexNetworkDataSource = impl
-
 }

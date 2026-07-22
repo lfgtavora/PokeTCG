@@ -1,5 +1,6 @@
 package com.lfgtavora.poketcg.network.retrofit
 
+import com.lfgtavora.poketcg.network.BuildConfig
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse
@@ -50,8 +51,6 @@ private interface TcgDexNetworkApi {
     ): SearchDataResponse
 }
 
-private const val BASE_URL = "http://10.0.2.2:8080/v2/"
-
 @Singleton
 internal class TcgDexNetwork @Inject constructor(
     networkJson: Json,
@@ -66,7 +65,7 @@ internal class TcgDexNetwork @Inject constructor(
                     "application/json".toMediaType()
                 )
             )
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.TCG_BASE_URL)
             .build()
             .create(TcgDexNetworkApi::class.java)
     }
