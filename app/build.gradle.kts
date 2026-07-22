@@ -24,11 +24,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("releaseLocal") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     buildFeatures {
