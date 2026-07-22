@@ -13,15 +13,7 @@ dependencies {
     api(project(":core:model"))
     api(project(":core:database"))
     api(project(":core:network"))
-
-    implementation(libs.hilt.android)
+    implementation(libs.androidx.room.runtime)
     ksp(libs.hilt.compiler)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-
     implementation(libs.androidx.paging.runtime)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

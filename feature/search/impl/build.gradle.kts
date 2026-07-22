@@ -11,8 +11,5 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":feature:search:api"))
     implementation(project(":feature:card-detail:api"))
-    implementation(libs.coil.okhttp)
 
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
 }

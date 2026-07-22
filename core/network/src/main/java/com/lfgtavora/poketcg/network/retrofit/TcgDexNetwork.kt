@@ -1,6 +1,5 @@
 package com.lfgtavora.poketcg.network.retrofit
 
-import androidx.room.Index
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse

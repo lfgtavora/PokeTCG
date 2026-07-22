@@ -12,8 +12,6 @@ dependencies {
     implementation(project(":feature:home:api"))
     implementation(project(":feature:sets:api"))
 
-    implementation(libs.coil.okhttp)
-
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 }

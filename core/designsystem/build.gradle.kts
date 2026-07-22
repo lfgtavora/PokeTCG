@@ -18,6 +18,7 @@ dependencies {
     api(libs.androidx.compose.ui.util)
 
     api(libs.androidx.palette)
+    api(libs.coil.okhttp)
 
     api(libs.coil.compose)
 

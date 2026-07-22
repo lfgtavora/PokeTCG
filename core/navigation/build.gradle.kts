@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.poketcg.hilt)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.compose)
+    alias(libs.plugins.poketcg.android.library.compose)
 }
 
 android {
