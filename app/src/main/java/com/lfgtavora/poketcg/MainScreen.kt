@@ -1,5 +1,6 @@
 package com.lfgtavora.poketcg
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
@@ -30,10 +31,8 @@ import androidx.navigation3.runtime.NavKey
 import com.lfgtavora.poketcg.core.navigation.Navigator
 import com.lfgtavora.poketcg.feature.card_detail.api.navigateToCardDetail
 import com.lfgtavora.poketcg.feature.home.impl.HomeScreen
-import com.lfgtavora.poketcg.feature.search.api.navigateToSearch
 import com.lfgtavora.poketcg.feature.sets.api.navigateToSetDetail
 import com.lfgtavora.poketcg.search.impl.SearchScreen
-import kotlinx.serialization.Serializable
 
 @Composable
 fun MainScreen(
@@ -87,8 +86,14 @@ fun MainScreen(
                         }
                     )
 
-                    AppDestinations.PROFILE -> {
-                        Text(text = "Profile")
+                    AppDestinations.FAVORITES -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = " Under construction")
+                        }
                     }
 
                     else -> {}
@@ -112,5 +117,5 @@ enum class AppDestinations(
 ) {
     HOME("Home", Icons.Default.Home),
     SEARCH("Search", Icons.Default.Search),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    FAVORITES("Favorites", Icons.Default.Favorite),
 }
