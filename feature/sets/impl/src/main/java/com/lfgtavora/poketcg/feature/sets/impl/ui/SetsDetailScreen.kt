@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.feature.sets.impl
+package com.lfgtavora.poketcg.feature.sets.impl.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent

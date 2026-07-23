@@ -8,8 +8,8 @@ import androidx.navigation3.runtime.NavKey
 import com.lfgtavora.poketcg.core.navigation.Navigator
 import com.lfgtavora.poketcg.feature.card_detail.api.CardDetailNavKey
 import com.lfgtavora.poketcg.feature.sets.api.SetsDetailNavKey
-import com.lfgtavora.poketcg.feature.sets.impl.SetsDetailsScreen
-import com.lfgtavora.poketcg.feature.sets.impl.SetsDetailsViewModel
+import com.lfgtavora.poketcg.feature.sets.impl.ui.SetsDetailsScreen
+import com.lfgtavora.poketcg.feature.sets.impl.ui.SetsDetailsViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun EntryProviderScope<NavKey>.setsDetailEntry(navigator: Navigator) {

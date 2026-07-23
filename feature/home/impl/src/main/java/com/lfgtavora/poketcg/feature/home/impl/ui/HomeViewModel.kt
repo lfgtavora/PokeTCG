@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.feature.home.impl
+package com.lfgtavora.poketcg.feature.home.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,4 +26,10 @@ class HomeViewModel @Inject constructor(
                 initialValue = PagingData.empty()
             )
 
+}
+
+sealed interface HomeUiState {
+    object Loading : HomeUiState
+    data class Success(val sets: List<SetPreview>) : HomeUiState
+    data object Error : HomeUiState
 }

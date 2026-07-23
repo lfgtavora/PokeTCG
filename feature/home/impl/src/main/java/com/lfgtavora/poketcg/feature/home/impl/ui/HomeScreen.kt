@@ -1,6 +1,7 @@
-package com.lfgtavora.poketcg.feature.home.impl
+package com.lfgtavora.poketcg.feature.home.impl.ui
 
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +31,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +49,8 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
+import com.lfgtavora.poketcg.feature.home.impl.preview.fakeSetList
+import com.lfgtavora.poketcg.feature.home.impl.preview.fakeSetWithVeryLongName
 import com.lfgtavora.poketcg.model.data.SetPreview
 import kotlinx.coroutines.flow.flowOf
 
@@ -87,13 +89,6 @@ internal fun HomeScreen(
                 .fillMaxSize()
                 .testTag("home_sets_grid")
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-
-                Text(
-                    text = "Sets",
-                    style = MaterialTheme.typography.displaySmall,
-                )
-            }
             items(
                 key = lazyPagingItems.itemKey { it.id },
                 count = lazyPagingItems.itemCount,
@@ -206,7 +201,7 @@ private fun SetCardView(
                         onSuccess = {
                             (it.result.image as? BitmapImage)?.bitmap?.let { bitmap ->
                                 val softwareBitmap =
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && bitmap.config == Bitmap.Config.HARDWARE) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bitmap.config == Bitmap.Config.HARDWARE) {
                                         bitmap.copy(Bitmap.Config.ARGB_8888, false)
                                     } else {
                                         bitmap

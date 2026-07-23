@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.feature.home.impl
+package com.lfgtavora.poketcg.feature.home.impl.preview
 
 import com.lfgtavora.poketcg.model.data.SetPreview
 

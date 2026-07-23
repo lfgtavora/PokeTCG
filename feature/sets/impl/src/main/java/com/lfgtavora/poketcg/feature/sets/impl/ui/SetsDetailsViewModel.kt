@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.feature.sets.impl
+package com.lfgtavora.poketcg.feature.sets.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
