@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -59,14 +61,24 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import coil3.ColorImage
+import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePreviewHandler
+import coil3.compose.LocalAsyncImagePreviewHandler
 import com.lfgtavora.poketcg.core.ui.R
+import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeCardPreview
+import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeCardPreviewList
+import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeSet
 import com.lfgtavora.poketcg.model.data.CardPreview
 import com.lfgtavora.poketcg.ui.PokecardCard
+import kotlinx.coroutines.flow.flowOf
 
 private val QuickLookShape = RoundedCornerShape(12.dp)
 private const val CardAspectRatio = 2.5f / 3.5f
@@ -89,65 +101,69 @@ internal fun SetsDetailsScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCoilApi::class)
 @Composable
 internal fun SetDetailScreen(
     setUiState: SetUiState,
     cardsPagingItems: LazyPagingItems<CardPreview>,
     onBack: () -> Unit = {},
-    onItemClick: (id: String) -> Unit = {}
+    onItemClick: (id: String) -> Unit = {},
+    previewHandler: AsyncImagePreviewHandler? = null,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ChevronLeft,
-                            contentDescription = "back"
-                        )
-                    }
-                },
-                title = {
-                    // Keep a stable title height so Scaffold contentPadding doesn't jump
-                    // when set metadata arrives after the first frame.
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (setUiState is SetUiState.Success) {
-                            AsyncImage(
-                                model = setUiState.set.logo,
-                                contentDescription = setUiState.set.name,
-                                modifier = Modifier.widthIn(max = 100.dp)
+    CompositionLocalProvider(
+        LocalAsyncImagePreviewHandler provides (previewHandler
+            ?: LocalAsyncImagePreviewHandler.current)
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Default.ChevronLeft,
+                                contentDescription = "back"
+                            )
+                        }
+                    },
+                    title = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (setUiState is SetUiState.Success) {
+                                AsyncImage(
+                                    model = setUiState.set.logo,
+                                    contentDescription = setUiState.set.name,
+                                    modifier = Modifier.widthIn(max = 100.dp)
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "information"
                             )
                         }
                     }
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "information"
-                        )
-                    }
-                }
+                )
+            }
+        ) { innerPadding ->
+            PokeCardList(
+                cardsPagingItems = cardsPagingItems,
+                onItemClick = onItemClick,
+                contentPadding = PaddingValues(
+                    start = GridHorizontalPadding,
+                    top = innerPadding.calculateTopPadding(),
+                    end = GridHorizontalPadding,
+                    bottom = innerPadding.calculateBottomPadding(),
+                ),
             )
         }
-    ) { innerPadding ->
-        PokeCardList(
-            cardsPagingItems = cardsPagingItems,
-            onItemClick = onItemClick,
-            contentPadding = PaddingValues(
-                start = GridHorizontalPadding,
-                top = innerPadding.calculateTopPadding(),
-                end = GridHorizontalPadding,
-                bottom = innerPadding.calculateBottomPadding(),
-            ),
-        )
     }
 }
 
@@ -247,15 +263,7 @@ fun PokeCardList(
 
                         else -> {
                             if (state.endOfPaginationReached && cardsPagingItems.itemCount > 0) {
-                                item(span = { GridItemSpan(maxLineSpan) }) {
-                                    Text(
-                                        text = "Você chegou ao fim da lista",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
+
                             }
                         }
                     }
@@ -355,7 +363,7 @@ private fun SharedTransitionScope.CardQuickLookOverlay(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
-                                onClick = { /* consume to avoid dismiss */ },
+                                onClick = { },
                             ),
                     )
                 }
@@ -364,7 +372,101 @@ private fun SharedTransitionScope.CardQuickLookOverlay(
     }
 }
 
-@Preview
+@OptIn(ExperimentalCoilApi::class)
+private fun previewImageHandler() = AsyncImagePreviewHandler {
+    ColorImage(Color(0xFFE53935).toArgb())
+}
+
 @Composable
-private fun SetDetailUiScreenPreview() {
+private fun rememberPreviewPagingItems(
+    data: List<CardPreview> = emptyList(),
+    refresh: LoadState = LoadState.NotLoading(endOfPaginationReached = false),
+    append: LoadState = LoadState.NotLoading(endOfPaginationReached = true),
+): LazyPagingItems<CardPreview> {
+    val flow = remember(data, refresh, append) {
+        flowOf(
+            PagingData.from(
+                data = data,
+                sourceLoadStates = LoadStates(
+                    refresh = refresh,
+                    prepend = LoadState.NotLoading(endOfPaginationReached = false),
+                    append = append,
+                ),
+            )
+        )
+    }
+    return flow.collectAsLazyPagingItems()
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Success")
+@Composable
+private fun SetDetailSuccessPreview() {
+    SetDetailScreen(
+        setUiState = SetUiState.Success(fakeSet),
+        cardsPagingItems = rememberPreviewPagingItems(data = fakeCardPreviewList),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Loading")
+@Composable
+private fun SetDetailLoadingPreview() {
+    SetDetailScreen(
+        setUiState = SetUiState.Loading,
+        cardsPagingItems = rememberPreviewPagingItems(
+            refresh = LoadState.Loading,
+        ),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Error")
+@Composable
+private fun SetDetailErrorPreview() {
+    SetDetailScreen(
+        setUiState = SetUiState.Error,
+        cardsPagingItems = rememberPreviewPagingItems(
+            refresh = LoadState.Error(Exception("Failed to load cards")),
+        ),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Append loading")
+@Composable
+private fun SetDetailAppendLoadingPreview() {
+    SetDetailScreen(
+        setUiState = SetUiState.Success(fakeSet),
+        cardsPagingItems = rememberPreviewPagingItems(
+            data = fakeCardPreviewList,
+            append = LoadState.Loading,
+        ),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@Preview(showBackground = true, name = "CardPlaceholder")
+@Composable
+private fun CardPlaceholderPreview() {
+    CardPlaceholder()
+}
+
+@OptIn(ExperimentalCoilApi::class, ExperimentalSharedTransitionApi::class)
+@Preview(showBackground = true, name = "QuickLook")
+@Composable
+private fun CardQuickLookOverlayPreview() {
+    CompositionLocalProvider(
+        LocalAsyncImagePreviewHandler provides previewImageHandler()
+    ) {
+        SharedTransitionLayout {
+            CardQuickLookOverlay(
+                card = fakeCardPreview,
+                onDismiss = {},
+            )
+        }
+    }
 }

@@ -28,7 +28,7 @@ class GetCardsPreviewFromSetUseCase @Inject constructor(
 
 
     companion object Companion {
-        private const val DEFAULT_PAGE_SIZE = 32
+        private const val DEFAULT_PAGE_SIZE = 48
     }
 }
 
