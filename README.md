@@ -16,7 +16,7 @@ Inspired by [Now in Android](https://github.com/android/nowinandroid), this proj
 
 The original integration targeted the [Pokémon TCG API](https://docs.pokemontcg.io/), which turned out to be unreliable at times. After checking with the community on Discord, I learned the maintainer is deprecating that service and folding it into a paid offering — while leaving open the card database repo, which remains updated.
 
-To work around that, I built a companion backend that serves this data: [API backend](YOUR_API_REPO_URL).
+To work around that, I built a companion backend that serves this data: [API backend](https://github.com/lfgtavora/poketcg-api).
 
 ## Stack & structure
 
