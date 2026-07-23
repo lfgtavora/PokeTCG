@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -84,6 +86,7 @@ private val QuickLookShape = RoundedCornerShape(12.dp)
 private const val CardAspectRatio = 2.5f / 3.5f
 private val GridHorizontalPadding = 8.dp
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 internal fun SetsDetailsScreen(
     viewModel: SetsDetailsViewModel = hiltViewModel(),
@@ -252,12 +255,13 @@ fun PokeCardList(
 
                         is LoadState.Error -> {
                             item(span = { GridItemSpan(maxLineSpan) }) {
-                                Button(
-                                    onClick = { cardsPagingItems.retry() },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(text = "Try again")
-                                }
+                                ErrorState(
+                                    message = "Something went wrong",
+                                    onRetry = { cardsPagingItems.retry() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                )
                             }
                         }
 
@@ -275,13 +279,13 @@ fun PokeCardList(
             }
 
             if (cardsPagingItems.loadState.refresh is LoadState.Error && cardsPagingItems.itemCount == 0) {
-                Text(text = "Try again")
-                Button(
-                    onClick = { cardsPagingItems.retry() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Try again")
-                }
+                ErrorState(
+                    message = "Something went wrong",
+                    onRetry = { cardsPagingItems.retry() },
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(24.dp),
+                )
             }
 
             CardQuickLookOverlay(
@@ -301,6 +305,29 @@ private fun CardPlaceholder() {
             .clip(QuickLookShape)
             .background(Color.LightGray.copy(alpha = 0.35f))
     )
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(onClick = onRetry) {
+            Text(text = "Try again")
+        }
+    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -453,6 +480,16 @@ private fun SetDetailAppendLoadingPreview() {
 @Composable
 private fun CardPlaceholderPreview() {
     CardPlaceholder()
+}
+
+@Preview(showBackground = true, name = "ErrorState")
+@Composable
+private fun ErrorStatePreview() {
+    ErrorState(
+        message = "Something went wrong",
+        onRetry = {},
+        modifier = Modifier.padding(24.dp),
+    )
 }
 
 @OptIn(ExperimentalCoilApi::class, ExperimentalSharedTransitionApi::class)
