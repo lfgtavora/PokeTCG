@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.lfgtavora.poketcg.data.repository.SearchRepository
 import com.lfgtavora.poketcg.model.data.SearchResultItem
+import com.lfgtavora.poketcg.search.impl.ui.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

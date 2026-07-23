@@ -137,17 +137,7 @@ internal fun HomeScreen(
                 }
 
                 else -> {
-                    if (state.endOfPaginationReached && lazyPagingItems.itemCount > 0) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Text(
-                                text = "Você chegou ao fim da lista",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
+
                 }
             }
         }

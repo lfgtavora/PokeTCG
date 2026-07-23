@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.search.impl
+package com.lfgtavora.poketcg.search.impl.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,6 +41,7 @@ import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
 import com.lfgtavora.poketcg.core.ui.R
 import com.lfgtavora.poketcg.model.data.SearchResultItem
+import com.lfgtavora.poketcg.search.impl.preview.fakeSearchResults
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -92,51 +93,65 @@ private fun SearchScreen(
                 )
             }
         ) { paddingValues ->
-            Column(
+            Box(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                if (error != null) {
-                    Text(text = error)
-                    return@Column
-                }
-                if (items.isNotEmpty()) {
-                    LazyColumn{
-                        items(
-                            items = items,
-                            key = { item ->
-                                when (item) {
-                                    is SearchResultItem.Card -> "card-${item.id}"
-                                    is SearchResultItem.Set -> "set-${item.id}"
-                                }
-                            }
-                        ) { item ->
-                            when (item) {
-                                is SearchResultItem.Card -> CardItem(
-                                    id = item.id,
-                                    name = item.name,
-                                    image = item.image,
-                                    setName = item.set?.name,
-                                    onClick = { onCardClick(item.id) }
-                                )
+                when {
+                    error != null -> {
+                        Text(
+                            text = error,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
 
-                                is SearchResultItem.Set -> SetItem(
-                                    name = item.name,
-                                    image = item.logo,
-                                    onClick = { onCardClick(item.id) }
-                                )
+                    items.isNotEmpty() -> {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(
+                                items = items,
+                                key = { item ->
+                                    when (item) {
+                                        is SearchResultItem.Card -> "card-${item.id}"
+                                        is SearchResultItem.Set -> "set-${item.id}"
+                                    }
+                                }
+                            ) { item ->
+                                when (item) {
+                                    is SearchResultItem.Card -> CardItem(
+                                        id = item.id,
+                                        name = item.name,
+                                        image = item.image,
+                                        setName = item.set?.name,
+                                        onClick = { onCardClick(item.id) }
+                                    )
+
+                                    is SearchResultItem.Set -> SetItem(
+                                        name = item.name,
+                                        image = item.logo,
+                                        onClick = { onCardClick(item.id) }
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                if(items.isEmpty() && !isLoading && query.isNotEmpty()){
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No results found")
+                    !isLoading && query.isNotEmpty() -> {
+                        Text(
+                            text = "No results found",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+
+                    !isLoading && query.isEmpty() -> {
+                        Text(
+                            text = "Search for cards or sets",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
@@ -244,37 +259,6 @@ fun SearchInput(
     )
 }
 
-private val fakeSearchResults = listOf(
-    SearchResultItem.Card(
-        id = "swsh1-25",
-        name = "Pikachu",
-        image = "https://assets.tcgdex.net/en/swsh/swsh1/25/low.webp",
-        set = SearchResultItem.Set(
-            id = "swsh1",
-            name = "Sword & Shield",
-            logo = "https://assets.tcgdex.net/en/swsh/swsh1/logo.webp",
-            series = "Sword & Shield",
-        ),
-    ),
-    SearchResultItem.Set(
-        id = "swsh1",
-        name = "Sword & Shield",
-        logo = "https://assets.tcgdex.net/en/swsh/swsh1/logo.webp",
-        series = "Sword & Shield",
-    ),
-    SearchResultItem.Card(
-        id = "swsh3-20",
-        name = "Charizard",
-        image = "https://assets.tcgdex.net/en/swsh/swsh3/20/low.webp",
-        set = SearchResultItem.Set(
-            id = "swsh3",
-            name = "Darkness Ablaze",
-            logo = "https://assets.tcgdex.net/en/swsh/swsh3/logo.webp",
-            series = "Sword & Shield",
-        ),
-    ),
-)
-
 @OptIn(ExperimentalCoilApi::class)
 private fun previewImageHandler() = AsyncImagePreviewHandler {
     ColorImage(Color.Red.toArgb())
@@ -288,6 +272,21 @@ private fun SearchScreenEmptyPreview() {
         onCardClick = {},
         onSearchValueChange = {},
         query = "",
+        isLoading = false,
+        error = null,
+        items = emptyList(),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun SearchScreenNoResultsPreview() {
+    SearchScreen(
+        onCardClick = {},
+        onSearchValueChange = {},
+        query = "xyz",
         isLoading = false,
         error = null,
         items = emptyList(),

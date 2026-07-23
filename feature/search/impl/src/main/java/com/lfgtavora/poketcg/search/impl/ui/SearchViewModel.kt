@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.search.impl
+package com.lfgtavora.poketcg.search.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

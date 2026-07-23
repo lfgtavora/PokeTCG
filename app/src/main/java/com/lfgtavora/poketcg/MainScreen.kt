@@ -32,7 +32,7 @@ import com.lfgtavora.poketcg.core.navigation.Navigator
 import com.lfgtavora.poketcg.feature.card_detail.api.navigateToCardDetail
 import com.lfgtavora.poketcg.feature.home.impl.HomeScreen
 import com.lfgtavora.poketcg.feature.sets.api.navigateToSetDetail
-import com.lfgtavora.poketcg.search.impl.SearchScreen
+import com.lfgtavora.poketcg.search.impl.ui.SearchScreen
 
 @Composable
 fun MainScreen(
