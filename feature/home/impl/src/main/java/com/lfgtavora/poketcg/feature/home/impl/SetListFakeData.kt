@@ -1,6 +1,6 @@
 package com.lfgtavora.poketcg.feature.home.impl
 
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.SetPreview
 
 
 internal val fakeSetWithVeryLongName = SetPreview(

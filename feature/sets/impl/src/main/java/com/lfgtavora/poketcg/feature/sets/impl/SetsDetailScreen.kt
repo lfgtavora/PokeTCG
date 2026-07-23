@@ -65,7 +65,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.lfgtavora.poketcg.core.ui.R
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.CardPreview
 import com.lfgtavora.poketcg.ui.PokecardCard
 
 private val QuickLookShape = RoundedCornerShape(12.dp)
@@ -201,11 +201,12 @@ fun PokeCardList(
                     }
 
                     val isSelected = card.id == selectedCard?.id
+
                     Box(modifier = Modifier.alpha(if (isSelected) 0f else 1f)) {
                         PokecardCard(
                             id = card.id,
                             name = card.name,
-                            imageUrl = card.image,
+                            imageUrl = card.image.small,
                             onClick = onItemClick,
                             onLongClick = { selectedCard = card },
                             modifier = Modifier.sharedElementWithCallerManagedVisibility(
@@ -337,7 +338,7 @@ private fun SharedTransitionScope.CardQuickLookOverlay(
                         .clip(QuickLookShape)
                 ) {
                     AsyncImage(
-                        model = targetCard.image,
+                        model = targetCard.image.large,
                         contentDescription = targetCard.name,
                         contentScale = ContentScale.Fit,
                         placeholder = painterResource(R.drawable.card_back),

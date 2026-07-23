@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.lfgtavora.poketcg.data.repository.SetRepository
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.SetPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted

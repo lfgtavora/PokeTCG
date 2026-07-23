@@ -2,7 +2,7 @@ package com.lfgtavora.poketcg.data.repository
 
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asSearchResultItem
-import com.lfgtavora.poketcg.model.SearchResultItem
+import com.lfgtavora.poketcg.model.data.SearchResultItem
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

@@ -2,11 +2,10 @@ package com.lfgtavora.poketcg.database.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.lfgtavora.poketcg.model.SetModel
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.SetModel
+import com.lfgtavora.poketcg.model.data.SetPreview
 
 @Entity(
     tableName = "sets",
@@ -57,7 +56,7 @@ fun SetEntity.asModel() =
         updatedAt = updatedAt,
         symbol = symbol,
         logo = logo,
-        legalities = com.lfgtavora.poketcg.model.Legalities(
+        legalities = com.lfgtavora.poketcg.model.data.Legalities(
             standard = legalities?.standard,
             expanded = legalities?.expanded,
             unlimited = legalities?.unlimited

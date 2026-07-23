@@ -1,9 +1,9 @@
-package com.lfgtavora.poketcg.feature.card_detail.impl
+package com.lfgtavora.poketcg.feature.card_detail.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lfgtavora.poketcg.data.repository.CardRepository
-import com.lfgtavora.poketcg.database.model.CardEntity
+import com.lfgtavora.poketcg.model.data.Card
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,7 +22,7 @@ class CardDetailViewModel @AssistedInject constructor(
 
     val uiState: StateFlow<CardDetailUiState> = cardRepository.getCard(
         id = cardId
-    ).map<CardEntity?, CardDetailUiState> {
+    ).map<Card?, CardDetailUiState> {
         CardDetailUiState.Success(it)
     }.catch {
         emit(CardDetailUiState.Error)
@@ -44,7 +44,7 @@ class CardDetailViewModel @AssistedInject constructor(
 }
 
 sealed interface CardDetailUiState {
-    data class Success(val card: CardEntity?) : CardDetailUiState
+    data class Success(val card: Card?) : CardDetailUiState
     object Error : CardDetailUiState
     object Loading : CardDetailUiState
 }

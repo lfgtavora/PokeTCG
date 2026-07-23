@@ -5,7 +5,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.Ability
+import com.lfgtavora.poketcg.model.data.AncientTrait
+import com.lfgtavora.poketcg.model.data.Attack
+import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardPreview
+import com.lfgtavora.poketcg.model.data.Resistance
+import com.lfgtavora.poketcg.model.data.Weakness
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -107,6 +113,55 @@ data class AncientTraitData(
 fun CardEntity.asCardPreview() = CardPreview(
     id = id,
     name = name,
-    image = imageSmall,
+    image = com.lfgtavora.poketcg.model.data.CardPreviewImage(
+        small = imageSmall,
+        large = imageLarge
+    ),
     setId = setId
+)
+
+fun CardEntity.asCard() = Card(
+    id = id,
+    name = name,
+    supertype = supertype,
+    subtypes = subtypes,
+    number = number,
+    artist = artist,
+    rarity = rarity,
+    flavorText = flavorText,
+    nationalPokedexNumbers = nationalPokedexNumbers,
+    imageSmall = imageSmall,
+    imageLarge = imageLarge,
+    setId = setId,
+    hp = hp,
+    types = types,
+    evolvesFrom = evolvesFrom,
+    evolvesTo = evolvesTo,
+    rules = rules,
+    retreatCost = retreatCost,
+    convertedRetreatCost = convertedRetreatCost,
+    level = level,
+    regulationMark = regulationMark,
+    attacks = attacks?.map {
+        Attack(
+            name = it.name,
+            cost = it.cost,
+            text = it.text,
+            damage = it.damage,
+            convertedEnergyCost = it.convertedEnergyCost,
+        )
+    },
+    weaknesses = weaknesses?.map { Weakness(type = it.type, value = it.value) },
+    resistances = resistances?.map { Resistance(type = it.type, value = it.value) },
+    abilities = abilities?.map {
+        Ability(name = it.name, text = it.text, type = it.type)
+    },
+    ancientTrait = ancientTrait?.let { AncientTrait(name = it.name, text = it.text) },
+    legalities = legalities?.let {
+        com.lfgtavora.poketcg.model.data.Legalities(
+            standard = it.standard,
+            expanded = it.expanded,
+            unlimited = it.unlimited,
+        )
+    },
 )

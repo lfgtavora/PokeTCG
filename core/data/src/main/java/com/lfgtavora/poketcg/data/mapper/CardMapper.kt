@@ -10,14 +10,14 @@ fun CardResponse.asEntity(): CardEntity =
     CardEntity(
         id = id,
         name = name,
-        supertype = supertype.orEmpty(), // CardEntity supertype is non-nullable
+        supertype = supertype.orEmpty(),
         subtypes = subtypes,
         number = number,
         artist = artist,
         rarity = rarity,
         hp = hp,
         evolvesTo = evolvesTo,
-        setId = set?.id.orEmpty(), // Map set.id to setId, default to empty string if null
+        setId = set?.id.orEmpty(),
         imageSmall = images?.small,
         imageLarge = images?.large,
         legalities = legalities?.let {
@@ -46,9 +46,8 @@ fun CardResponse.asEntity(): CardEntity =
                 convertedEnergyCost = it.convertedEnergyCost
             )
         },
-        // Fields in CardEntity not present in CardResponse will be null or default values
         flavorText = null,
-        types = null, // CardResponse does not have 'types'
+        types = null,
         evolvesFrom = null,
         level = null,
         regulationMark = null,

@@ -1,8 +1,8 @@
 package com.lfgtavora.poketcg.data.repository
 
 import androidx.paging.PagingData
-import com.lfgtavora.poketcg.database.model.CardEntity
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardPreview
 import kotlinx.coroutines.flow.Flow
 
 interface CardRepository {
@@ -15,5 +15,5 @@ interface CardRepository {
         orderBy: String? = null
     ): Flow<PagingData<CardPreview>>
 
-    fun getCard(id: String): Flow<CardEntity?>
+    fun getCard(id: String): Flow<Card?>
 }

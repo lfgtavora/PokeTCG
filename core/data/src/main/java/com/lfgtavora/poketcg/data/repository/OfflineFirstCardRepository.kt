@@ -11,8 +11,10 @@ import com.lfgtavora.poketcg.data.mediator.CardsRemoteMediator
 import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
 import com.lfgtavora.poketcg.database.model.CardEntity
+import com.lfgtavora.poketcg.database.model.asCard
 import com.lfgtavora.poketcg.database.model.asCardPreview
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardPreview
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -56,10 +58,11 @@ class OfflineFirstCardRepository @Inject constructor(
         }
     }
 
-    override fun getCard(id: String): Flow<CardEntity?> =
-        cardDao.getCardById(id).onStart {
-            refreshCard(id)
-        }.flowOn(ioDispatcher)
+    override fun getCard(id: String): Flow<Card?> =
+        cardDao.getCardById(id)
+            .map { it?.asCard() }
+            .onStart { refreshCard(id) }
+            .flowOn(ioDispatcher)
 
     private suspend fun refreshCard(id: String) =
         runCatching {

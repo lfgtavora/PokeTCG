@@ -8,13 +8,12 @@ import androidx.paging.map
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import androidx.room.withTransaction
 import com.lfgtavora.poketcg.data.mediator.SetsRemoteMediator
-import com.lfgtavora.poketcg.data.mediator.TransactionRunner
 import com.lfgtavora.poketcg.database.PokeTcgDatabase
 import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
 import com.lfgtavora.poketcg.database.model.SetEntity
 import com.lfgtavora.poketcg.database.model.asPreviewModel
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.SetPreview
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

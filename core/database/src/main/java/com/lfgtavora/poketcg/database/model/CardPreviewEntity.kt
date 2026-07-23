@@ -1,6 +1,7 @@
 package com.lfgtavora.poketcg.database.model
 
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.CardPreview
+import com.lfgtavora.poketcg.model.data.CardPreviewImage
 
 data class CardPreviewEntity(
     val id: String,
@@ -14,6 +15,9 @@ fun CardPreviewEntity.asModel() =
     CardPreview(
         id = id,
         name = name,
-        image = imageLarge,
+        image = CardPreviewImage(
+            small = imageSmall,
+            large = imageLarge
+        ),
         setId = setId
     )

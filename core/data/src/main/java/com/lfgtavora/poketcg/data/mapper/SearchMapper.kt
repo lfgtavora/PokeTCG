@@ -1,6 +1,6 @@
 package com.lfgtavora.poketcg.data.mapper
 
-import com.lfgtavora.poketcg.model.SearchResultItem
+import com.lfgtavora.poketcg.model.data.SearchResultItem
 import com.lfgtavora.poketcg.network.model.SearchItemResponse
 
 fun SearchItemResponse.asSearchResultItem(): SearchResultItem =

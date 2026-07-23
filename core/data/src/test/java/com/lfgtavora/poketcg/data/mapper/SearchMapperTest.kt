@@ -1,7 +1,7 @@
 package com.lfgtavora.poketcg.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import com.lfgtavora.poketcg.model.SearchResultItem
+import com.lfgtavora.poketcg.model.data.SearchResultItem
 import com.lfgtavora.poketcg.network.model.SearchCardImages
 import com.lfgtavora.poketcg.network.model.SearchItemResponse
 import com.lfgtavora.poketcg.network.model.SearchSetImages

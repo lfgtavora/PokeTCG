@@ -49,8 +49,7 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
-import coil3.request.ImageRequest
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.SetPreview
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalCoilApi::class)

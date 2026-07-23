@@ -2,7 +2,7 @@ package com.lfgtavora.poketcg.feature.sets.impl.domain
 
 import androidx.paging.PagingData
 import com.lfgtavora.poketcg.data.repository.CardRepository
-import com.lfgtavora.poketcg.model.CardPreview
+import com.lfgtavora.poketcg.model.data.CardPreview
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

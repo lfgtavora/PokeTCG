@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.model
+package com.lfgtavora.poketcg.model.data
 
 
 data class SetPreview(

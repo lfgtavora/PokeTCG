@@ -1,6 +1,6 @@
 package com.lfgtavora.poketcg.data.repository
 
-import com.lfgtavora.poketcg.model.SearchResultItem
+import com.lfgtavora.poketcg.model.data.SearchResultItem
 
 interface SearchRepository {
     suspend fun search(

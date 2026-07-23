@@ -1,4 +1,4 @@
-package com.lfgtavora.poketcg.feature.card_detail.impl
+package com.lfgtavora.poketcg.feature.card_detail.impl.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
@@ -7,6 +7,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lfgtavora.poketcg.core.navigation.Navigator
 import com.lfgtavora.poketcg.feature.card_detail.api.CardDetailNavKey
+import com.lfgtavora.poketcg.feature.card_detail.impl.ui.CardDetailScreen
+import com.lfgtavora.poketcg.feature.card_detail.impl.ui.CardDetailViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun EntryProviderScope<NavKey>.cardDetailEntry(navigator: Navigator) {

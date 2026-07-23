@@ -2,7 +2,7 @@ package com.lfgtavora.poketcg.database.model
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.lfgtavora.poketcg.model.SetWithCardsPreviewModel
+import com.lfgtavora.poketcg.model.data.SetWithCardsPreviewModel
 
 data class SetWithCardsPreviews(
     @Embedded

@@ -6,8 +6,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.lfgtavora.poketcg.data.repository.SetRepository
 import com.lfgtavora.poketcg.feature.sets.impl.domain.GetCardsPreviewFromSetUseCase
-import com.lfgtavora.poketcg.model.CardPreview
-import com.lfgtavora.poketcg.model.SetPreview
+import com.lfgtavora.poketcg.model.data.CardPreview
+import com.lfgtavora.poketcg.model.data.SetPreview
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
