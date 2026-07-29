@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.poketcg.android.library)
-     alias(libs.plugins.poketcg.hilt)
+    alias(libs.plugins.poketcg.hilt)
     id("kotlinx-serialization")
 }
 
@@ -11,8 +11,8 @@ android {
 
 dependencies {
     api(project(":core:model"))
-    api(project(":core:database"))
-    api(project(":core:network"))
+    implementation(project(":core:database"))
+    implementation(project(":core:network"))
     implementation(libs.androidx.room.runtime)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.paging.runtime)
