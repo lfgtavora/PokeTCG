@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import com.lfgtavora.poketcg.database.model.SetEntity
 import com.lfgtavora.poketcg.database.model.SetWithCardsPreviews
 import kotlinx.coroutines.flow.Flow
@@ -22,10 +23,10 @@ interface SetDao {
         itemsPerPage: Int
     ): Flow<List<SetEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertMany(sets: List<SetEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insert(set: SetEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

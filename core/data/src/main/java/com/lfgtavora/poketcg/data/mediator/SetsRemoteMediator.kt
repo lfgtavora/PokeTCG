@@ -54,10 +54,6 @@ internal class SetsRemoteMediator(
             val endOfPaginationReached = response.isEmpty()
 
             transactionRunner {
-                if (loadType == LoadType.REFRESH) {
-                    setRemoteKeyDao.clearRemoteKeys()
-                    setDao.clearAll()
-                }
                 val prevKey = if (page == 1) null else page - 1
                 val nextKey = if (endOfPaginationReached) null else page + 1
                 val keys = response.map {

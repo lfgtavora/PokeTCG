@@ -42,7 +42,7 @@ class SetsRemoteMediatorTest {
     }
 
     @Test
-    fun `refresh with empty state fetches page 1 clears and inserts`() = runTest {
+    fun `refresh with empty state fetches page 1 and upserts without clearing`() = runTest {
         coEvery {
             network.getSetsBrief(page = 1, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
         } returns listOf(sampleSet("sv1"), sampleSet("sv2"))
@@ -53,8 +53,8 @@ class SetsRemoteMediatorTest {
         val result = mediator.load(LoadType.REFRESH, emptyPagingState())
 
         assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isFalse()
-        coVerify { setRemoteKeyDao.clearRemoteKeys() }
-        coVerify { setDao.clearAll() }
+        coVerify(exactly = 0) { setRemoteKeyDao.clearRemoteKeys() }
+        coVerify(exactly = 0) { setDao.clearAll() }
         coVerify { setDao.insertMany(match { it.size == 2 }) }
         assertThat(keysSlot.captured).hasSize(2)
         assertThat(keysSlot.captured[0].prevKey).isNull()
