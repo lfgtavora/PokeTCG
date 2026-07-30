@@ -6,6 +6,15 @@ import com.lfgtavora.poketcg.database.model.Legalities
 import com.lfgtavora.poketcg.database.model.WeaknessData
 import com.lfgtavora.poketcg.network.model.CardResponse
 
+/**
+ * Leading digits for collector numbers (`"12a"` → 12).
+ * Non-numeric prefixes (`"TG01"`) sort after numbered cards.
+ */
+fun parseCardSortNumber(number: String): Int {
+    val digits = number.takeWhile { it.isDigit() }
+    return digits.toIntOrNull() ?: Int.MAX_VALUE
+}
+
 fun CardResponse.asEntity(): CardEntity =
     CardEntity(
         id = id,
@@ -13,6 +22,7 @@ fun CardResponse.asEntity(): CardEntity =
         supertype = supertype.orEmpty(),
         subtypes = subtypes,
         number = number,
+        sortNumber = parseCardSortNumber(number),
         artist = artist,
         rarity = rarity,
         hp = hp,

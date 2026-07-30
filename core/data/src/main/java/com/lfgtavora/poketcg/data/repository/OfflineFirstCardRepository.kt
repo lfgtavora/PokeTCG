@@ -5,9 +5,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asEntity
 import com.lfgtavora.poketcg.data.mediator.CardsRemoteMediator
+import com.lfgtavora.poketcg.database.PokeTcgDatabase
 import com.lfgtavora.poketcg.database.dao.CardDao
 import com.lfgtavora.poketcg.database.dao.SetDao
 import com.lfgtavora.poketcg.database.model.CardEntity
@@ -27,6 +29,7 @@ class OfflineFirstCardRepository @Inject constructor(
     val remoteDataSource: TcgDexNetworkDataSource,
     val cardDao: CardDao,
     val setDao: SetDao,
+    private val database: PokeTcgDatabase,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CardRepository {
 
@@ -41,7 +44,7 @@ class OfflineFirstCardRepository @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = pageSize,
-                prefetchDistance = pageSize * 2,
+                prefetchDistance = pageSize,
                 enablePlaceholders = false,
             ),
             remoteMediator = CardsRemoteMediator(
@@ -50,7 +53,11 @@ class OfflineFirstCardRepository @Inject constructor(
                 select = select,
                 orderBy = orderBy,
                 cardDao = cardDao,
-                network = remoteDataSource
+                cardRemoteKeyDao = database.cardRemoteKeyDao(),
+                network = remoteDataSource,
+                transactionRunner = { block ->
+                    database.withTransaction { block() }
+                },
             ),
             pagingSourceFactory = { cardDao.getCardsBySet(setId) }
         ).flow.map { pagingData ->

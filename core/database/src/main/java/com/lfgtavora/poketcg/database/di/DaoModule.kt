@@ -2,7 +2,9 @@ package com.lfgtavora.poketcg.database.di
 
 import com.lfgtavora.poketcg.database.PokeTcgDatabase
 import com.lfgtavora.poketcg.database.dao.CardDao
+import com.lfgtavora.poketcg.database.dao.CardRemoteKeyDao
 import com.lfgtavora.poketcg.database.dao.SetDao
+import com.lfgtavora.poketcg.database.dao.SetRemoteKeyDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,5 +23,13 @@ object DaoModule {
         database: PokeTcgDatabase,
     ): CardDao = database.cardDao()
 
+    @Provides
+    fun providesSetRemoteKeyDao(
+        database: PokeTcgDatabase,
+    ): SetRemoteKeyDao = database.setRemoteKeyDao()
 
+    @Provides
+    fun providesCardRemoteKeyDao(
+        database: PokeTcgDatabase,
+    ): CardRemoteKeyDao = database.cardRemoteKeyDao()
 }

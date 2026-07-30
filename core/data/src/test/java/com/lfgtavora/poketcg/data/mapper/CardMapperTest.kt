@@ -28,6 +28,17 @@ class CardMapperTest {
         assertThat(entity.weaknesses).isNull()
         assertThat(entity.types).isNull()
         assertThat(entity.flavorText).isNull()
+        assertThat(entity.sortNumber).isEqualTo(1)
+    }
+
+    @Test
+    fun `parseCardSortNumber extracts leading digits`() {
+        assertThat(parseCardSortNumber("1")).isEqualTo(1)
+        assertThat(parseCardSortNumber("1a")).isEqualTo(1)
+        assertThat(parseCardSortNumber("10")).isEqualTo(10)
+        assertThat(parseCardSortNumber("12a")).isEqualTo(12)
+        assertThat(parseCardSortNumber("TG01")).isEqualTo(Int.MAX_VALUE)
+        assertThat(parseCardSortNumber("GG70")).isEqualTo(Int.MAX_VALUE)
     }
 
     @Test
@@ -62,5 +73,6 @@ class CardMapperTest {
         assertThat(entity.imageSmall).isEqualTo("s.png")
         assertThat(entity.imageLarge).isEqualTo("l.png")
         assertThat(entity.legalities?.standard).isEqualTo("Legal")
+        assertThat(entity.sortNumber).isEqualTo(1)
     }
 }

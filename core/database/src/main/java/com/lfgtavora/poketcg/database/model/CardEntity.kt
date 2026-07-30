@@ -26,7 +26,8 @@ import kotlinx.serialization.Serializable
     ],
     indices = [
         Index(value = ["setId"]),
-        Index(value = ["supertype"])
+        Index(value = ["supertype"]),
+        Index(value = ["setId", "sortNumber", "number"]),
     ]
 )
 data class CardEntity(
@@ -36,6 +37,7 @@ data class CardEntity(
     val supertype: String,
     val subtypes: List<String>? = null,
     val number: String,
+    val sortNumber: Int = 0,
     val artist: String? = null,
     val rarity: String? = null,
     val flavorText: String? = null,

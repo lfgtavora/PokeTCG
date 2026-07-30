@@ -2,6 +2,7 @@ package com.lfgtavora.poketcg.database.di
 
 import android.content.Context
 import androidx.room.Room
+import com.lfgtavora.poketcg.database.MIGRATION_2_3
 import com.lfgtavora.poketcg.database.PokeTcgDatabase
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,8 @@ internal object DatabaseModule {
             context,
             PokeTcgDatabase::class.java,
             "poketcg-database"
-        ).build()
+        )
+            .addMigrations(MIGRATION_2_3)
+            .build()
 
 }

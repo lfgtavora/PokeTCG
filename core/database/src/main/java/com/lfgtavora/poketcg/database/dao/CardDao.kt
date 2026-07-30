@@ -16,7 +16,13 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE setId = :setId")
     fun getAllCardsFromSet(setId: String): Flow<List<CardEntity>>
 
-    @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY CAST(number AS INTEGER)")
+    @Query(
+        """
+        SELECT * FROM cards
+        WHERE setId = :setId
+        ORDER BY sortNumber ASC, number ASC, id ASC
+        """
+    )
     fun getCardsBySet(setId: String): PagingSource<Int, CardEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
