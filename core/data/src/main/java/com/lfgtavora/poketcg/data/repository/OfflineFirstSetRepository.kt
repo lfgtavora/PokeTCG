@@ -24,7 +24,6 @@ import javax.inject.Inject
 class OfflineFirstSetRepository @Inject constructor(
     private val network: TcgDexNetworkDataSource,
     private val setDao: SetDao,
-    private val cardDao: CardDao,
     private val database: PokeTcgDatabase,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SetRepository {

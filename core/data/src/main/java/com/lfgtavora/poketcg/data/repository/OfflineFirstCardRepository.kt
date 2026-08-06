@@ -71,10 +71,9 @@ class OfflineFirstCardRepository @Inject constructor(
             .onStart { refreshCard(id) }
             .flowOn(ioDispatcher)
 
-    private suspend fun refreshCard(id: String) =
-        runCatching {
-            val card = remoteDataSource.getCard(id).data
-            card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
-            cardDao.upsert(card.asEntity())
-        }
+    private suspend fun refreshCard(id: String) {
+        val card = remoteDataSource.getCard(id).data
+        card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
+        cardDao.upsert(card.asEntity())
+    }
 }
