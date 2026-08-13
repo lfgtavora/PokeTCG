@@ -1,10 +1,14 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+
 plugins {
     alias(libs.plugins.poketcg.hilt)
     alias(libs.plugins.poketcg.android.application)
     alias(libs.plugins.poketcg.android.application.compose)
     id("org.jetbrains.kotlin.plugin.serialization")
-
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
+
 
 android {
     namespace = "com.lfgtavora.poketcg"
@@ -23,6 +27,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
@@ -34,6 +43,16 @@ android {
             initWith(getByName("release"))
             matchingFallbacks += listOf("release")
             signingConfig = signingConfigs.getByName("debug")
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+        }
+    }
+    productFlavors {
+        named("demo") {
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
     }
     buildFeatures {
@@ -42,16 +61,20 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:network"))
-    implementation(project(":core:navigation"))
-    implementation(project(":feature:home:api"))
-    implementation(project(":feature:home:impl"))
-    implementation(project(":feature:sets:api"))
-    implementation(project(":feature:sets:impl"))
-    implementation(project(":feature:card-detail:api"))
-    implementation(project(":feature:card-detail:impl"))
-    implementation(project(":feature:search:impl"))
-    implementation(project(":feature:search:api"))
+    implementation(projects.core.analytics)
+    implementation(projects.core.crashlytics)
+    implementation(projects.core.network)
+    implementation(projects.core.navigation)
+
+    implementation(projects.feature.home.api)
+    implementation(projects.feature.home.impl)
+    implementation(projects.feature.sets.api)
+    implementation(projects.feature.sets.impl)
+    implementation(projects.feature.cardDetail.api)
+    implementation(projects.feature.cardDetail.impl)
+    implementation(projects.feature.search.impl)
+    implementation(projects.feature.search.api)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

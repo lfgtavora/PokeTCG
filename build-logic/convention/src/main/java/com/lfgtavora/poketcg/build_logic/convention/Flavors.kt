@@ -9,12 +9,11 @@ enum class PokeTcgFlavor(val applicationIdSuffix: String? = null) {
     prod,
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 fun configureFlavors(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
         flavorDimensions += "tier"
         productFlavors {
-            PokeTcgFlavor.entries.forEach { flavor ->
+            PokeTcgFlavor.values().forEach { flavor ->
                 create(flavor.name) {
                     dimension = "tier"
                     if (this@apply is ApplicationExtension && this is ApplicationProductFlavor) {

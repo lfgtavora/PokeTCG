@@ -9,6 +9,8 @@ import androidx.room.withTransaction
 import com.lfgtavora.poketcg.core.common.RetryPolicy
 import com.lfgtavora.poketcg.core.common.suspendRunCatching
 import com.lfgtavora.poketcg.core.common.withRetry
+import com.lfgtavora.poketcg.core.crashlytics.CrashlyticsHelper
+import com.lfgtavora.poketcg.core.crashlytics.recordException
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asEntity
 import com.lfgtavora.poketcg.data.mediator.SetsRemoteMediator
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 class OfflineFirstSetRepository @Inject constructor(
@@ -34,6 +37,7 @@ class OfflineFirstSetRepository @Inject constructor(
     private val setDao: SetDao,
     private val setRemoteKeyDao: SetRemoteKeyDao,
     private val database: PokeTcgDatabase,
+    private val crashlytics: CrashlyticsHelper,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SetRepository {
 
@@ -105,6 +109,16 @@ class OfflineFirstSetRepository @Inject constructor(
             suspendRunCatching {
                 val setResponse = withRetry(retryPolicy) { network.getSet(id) }
                 setDao.insert(setResponse.asEntity())
+            }.onFailure { throwable ->
+                if (throwable !is IOException) {
+                    crashlytics.recordException(
+                        throwable = throwable,
+                        extras = mapOf(
+                            "set_id" to id,
+                            "retry_police" to retryPolicy.toString()
+                        ),
+                    )
+                }
             }
         }
 }

@@ -21,21 +21,27 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PokeTCG"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 include(":app")
+
 include(":core:ui")
 include(":core:network")
 include(":core:database")
 include(":core:model")
 include(":core:data")
-include(":feature:home:api")
-include(":feature:home:impl")
 include(":core:navigation")
 include(":core:designsystem")
+include(":core:common")
+include(":core:analytics")
+
+include(":feature:home:api")
+include(":feature:home:impl")
 include(":feature:sets:api")
 include(":feature:sets:impl")
 include(":feature:card-detail:api")
 include(":feature:card-detail:impl")
 include(":feature:search:api")
 include(":feature:search:impl")
-include(":core:common")
-include(":core:analytics")
+
+include(":core:crashlytics")

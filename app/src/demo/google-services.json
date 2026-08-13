@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "0",
+    "project_id": "poketcg-demo-unused",
+    "storage_bucket": "poketcg-demo-unused.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:0:android:0",
+        "android_client_info": {
+          "package_name": "com.lfgtavora.poketcg.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "demo-unused"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

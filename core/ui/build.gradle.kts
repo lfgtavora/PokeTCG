@@ -8,5 +8,6 @@ android {
 }
 
 dependencies {
-    api(project(":core:designsystem"))
+    api(projects.core.analytics)
+    api(projects.core.designsystem)
 }

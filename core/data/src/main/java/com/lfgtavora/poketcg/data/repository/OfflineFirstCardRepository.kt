@@ -9,6 +9,8 @@ import androidx.room.withTransaction
 import com.lfgtavora.poketcg.core.common.RetryPolicy
 import com.lfgtavora.poketcg.core.common.suspendRunCatching
 import com.lfgtavora.poketcg.core.common.withRetry
+import com.lfgtavora.poketcg.core.crashlytics.CrashlyticsHelper
+import com.lfgtavora.poketcg.core.crashlytics.recordException
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asEntity
 import com.lfgtavora.poketcg.data.mediator.CardsRemoteMediator
@@ -28,6 +30,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 class OfflineFirstCardRepository @Inject constructor(
@@ -35,6 +38,7 @@ class OfflineFirstCardRepository @Inject constructor(
     val cardDao: CardDao,
     val setDao: SetDao,
     private val database: PokeTcgDatabase,
+    private val crashlytics: CrashlyticsHelper,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CardRepository {
 
@@ -90,6 +94,16 @@ class OfflineFirstCardRepository @Inject constructor(
                 val card = withRetry(retryPolicy) { remoteDataSource.getCard(id).data }
                 card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
                 cardDao.upsert(card.asEntity())
+            }.onFailure { throwable ->
+                if (throwable !is IOException) {
+                    crashlytics.recordException(
+                        throwable = throwable,
+                        extras = mapOf(
+                            "card_id" to id,
+                            "retry_police" to retryPolicy.toString()
+                        ),
+                    )
+                }
             }
         }
 }

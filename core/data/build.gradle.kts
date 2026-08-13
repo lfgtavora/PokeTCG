@@ -14,6 +14,7 @@ dependencies {
     api(project(":core:common"))
     implementation(project(":core:database"))
     implementation(project(":core:network"))
+    implementation(project(":core:crashlytics"))
     implementation(libs.androidx.room.runtime)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.paging.runtime)

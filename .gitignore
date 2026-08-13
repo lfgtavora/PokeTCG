@@ -15,3 +15,7 @@
 /.vscode
 /.kotlin
 local.properties
+
+# Real Firebase config. Demo dummy is committed so flavor builds without secrets.
+**/google-services.json
+!app/src/demo/google-services.json
