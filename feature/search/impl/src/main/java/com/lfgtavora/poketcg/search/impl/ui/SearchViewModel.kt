@@ -37,12 +37,13 @@ class SearchViewModel @Inject constructor(
                 }
 
                 emit(SearchResult.Loading)
-                try {
-                    val results = searchRepository.search(query)
-                    emit(SearchResult.Success(results))
-                } catch (e: Exception) {
-                    emit(SearchResult.Error(e.localizedMessage ?: "Erro desconhecido"))
-                }
+                searchRepository.search(query)
+                    .onSuccess {
+                        emit(SearchResult.Success(it))
+                    }
+                    .onFailure {
+                        emit(SearchResult.Error(it.message ?: "Unknown error"))
+                    }
             }
         }
 

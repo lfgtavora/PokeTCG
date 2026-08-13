@@ -6,5 +6,5 @@ interface SearchRepository {
     suspend fun search(
         query: String,
         types: String = "card,set",
-    ): List<SearchResultItem>
+    ): Result<List<SearchResultItem>>
 }
