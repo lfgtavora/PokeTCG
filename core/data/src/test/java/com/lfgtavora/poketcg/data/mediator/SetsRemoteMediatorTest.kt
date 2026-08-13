@@ -44,7 +44,7 @@ class SetsRemoteMediatorTest {
     @Test
     fun `refresh with empty state fetches page 1 and upserts without clearing`() = runTest {
         coEvery {
-            network.getSetsBrief(page = 1, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
+            network.getSets(page = 1, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
         } returns listOf(sampleSet("sv1"), sampleSet("sv2"))
 
         val keysSlot = slot<List<SetRemoteKeysEntity>>()
@@ -70,14 +70,14 @@ class SetsRemoteMediatorTest {
             nextKey = 3,
         )
         coEvery {
-            network.getSetsBrief(page = 3, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
+            network.getSets(page = 3, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
         } returns listOf(sampleSet("sv3"))
 
         val result = mediator.load(LoadType.APPEND, pagingStateWith(set))
 
         assertThat(result).isInstanceOf(RemoteMediator.MediatorResult.Success::class.java)
         coVerify {
-            network.getSetsBrief(page = 3, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
+            network.getSets(page = 3, pageSize = 20, orderBy = "-releaseDate", field = "releaseDate")
         }
     }
 
@@ -93,7 +93,7 @@ class SetsRemoteMediatorTest {
         val result = mediator.load(LoadType.APPEND, pagingStateWith(set))
 
         assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isTrue()
-        coVerify(exactly = 0) { network.getSetsBrief(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { network.getSets(any(), any(), any(), any()) }
     }
 
     @Test
@@ -108,13 +108,13 @@ class SetsRemoteMediatorTest {
         val result = mediator.load(LoadType.PREPEND, pagingStateWith(set))
 
         assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isTrue()
-        coVerify(exactly = 0) { network.getSetsBrief(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { network.getSets(any(), any(), any(), any()) }
     }
 
     @Test
     fun `empty network list reaches end and writes null nextKey`() = runTest {
         coEvery {
-            network.getSetsBrief(any(), any(), any(), any())
+            network.getSets(any(), any(), any(), any())
         } returns emptyList()
 
         val keysSlot = slot<List<SetRemoteKeysEntity>>()
@@ -129,7 +129,7 @@ class SetsRemoteMediatorTest {
     @Test
     fun `ioException returns error`() = runTest {
         coEvery {
-            network.getSetsBrief(any(), any(), any(), any())
+            network.getSets(any(), any(), any(), any())
         } throws IOException("offline")
 
         val result = mediator.load(LoadType.REFRESH, emptyPagingState())

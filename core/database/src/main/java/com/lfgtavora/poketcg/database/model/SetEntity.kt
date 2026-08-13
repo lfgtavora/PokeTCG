@@ -41,7 +41,7 @@ fun SetEntity.asPreviewModel() =
         name = name,
         logo = logo,
         releaseDate = releaseDate,
-        totalCards = total
+        totalCards = printedTotal
     )
 
 fun SetEntity.asModel() =

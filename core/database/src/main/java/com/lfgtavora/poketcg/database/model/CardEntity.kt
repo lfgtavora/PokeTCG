@@ -45,6 +45,7 @@ data class CardEntity(
     val imageSmall: String? = null,
     val imageLarge: String? = null,
     val setId: String,
+    val lastFullSyncAt: Long? = null,
 
     /**
      * Pokemon Specific Properties
@@ -140,6 +141,7 @@ fun CardEntity.asCard() = Card(
     evolvesFrom = evolvesFrom,
     evolvesTo = evolvesTo,
     rules = rules,
+    lastFullSyncAt = lastFullSyncAt,
     retreatCost = retreatCost,
     convertedRetreatCost = convertedRetreatCost,
     level = level,

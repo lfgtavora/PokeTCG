@@ -10,10 +10,20 @@ import com.lfgtavora.poketcg.network.model.CardResponse
  * Leading digits for collector numbers (`"12a"` → 12).
  * Non-numeric prefixes (`"TG01"`) sort after numbered cards.
  */
-fun parseCardSortNumber(number: String): Int {
+internal fun parseCardSortNumber(number: String): Int {
     val digits = number.takeWhile { it.isDigit() }
     return digits.toIntOrNull() ?: Int.MAX_VALUE
 }
+
+/**
+ *
+ * @param card
+ * @return
+ * @see [CardEntity.lastFullSyncAt]
+ */
+private fun CardResponse.isPartialResponse(): Boolean =
+    nationalPokedexNumbers == null && legalities == null
+
 
 fun CardResponse.asEntity(): CardEntity =
     CardEntity(
@@ -63,5 +73,6 @@ fun CardResponse.asEntity(): CardEntity =
         regulationMark = null,
         resistances = null,
         abilities = null,
-        ancientTrait = null
+        ancientTrait = null,
+        lastFullSyncAt = if (isPartialResponse()) null else System.currentTimeMillis()
     )

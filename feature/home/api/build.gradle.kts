@@ -7,5 +7,7 @@ android {
 }
 
 dependencies {
-
+    api(libs.androidx.paging.common)
+    api(libs.kotlinx.coroutines.core)
+    api(project(":core:model"))
 }

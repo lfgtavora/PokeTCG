@@ -2,14 +2,25 @@ package com.lfgtavora.poketcg.feature.sets.impl.preview
 
 import com.lfgtavora.poketcg.model.data.CardPreview
 import com.lfgtavora.poketcg.model.data.CardPreviewImage
-import com.lfgtavora.poketcg.model.data.SetPreview
+import com.lfgtavora.poketcg.model.data.Legalities
+import com.lfgtavora.poketcg.model.data.SetModel
 
-internal val fakeSet = SetPreview(
+internal val fakeSet = SetModel(
     id = "base1",
     name = "Base Set",
+    series = "Base",
+    printedTotal = 102,
+    total = 102,
+    ptcgoCode = "BS",
     releaseDate = "1999-01-09",
+    updatedAt = "2020-08-14T09:00:00.000Z",
+    symbol = "https://images.pokemontcg.io/base1/symbol.png",
     logo = "https://images.pokemontcg.io/base1/logo.png",
-    totalCards = 102,
+    legalities = Legalities(
+        standard = null,
+        expanded = "Legal",
+        unlimited = "Legal",
+    ),
 )
 
 internal val fakeCardPreview = CardPreview(

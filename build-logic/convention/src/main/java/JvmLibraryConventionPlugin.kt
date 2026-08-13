@@ -25,12 +25,12 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "org.jetbrains.kotlin.jvm")
-            apply(plugin = "poketcg.android.lint")
+            //apply(plugin = "poketcg.android.lint")
 
             configureKotlinJvm()
-            dependencies {
-                "testImplementation"(libs.findLibrary("kotlin.test").get())
-            }
+//            dependencies {
+//                "testImplementation"(libs.findLibrary("kotlin.test").get())
+//            }
         }
     }
 }

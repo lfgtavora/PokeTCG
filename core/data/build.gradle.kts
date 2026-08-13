@@ -11,6 +11,7 @@ android {
 
 dependencies {
     api(project(":core:model"))
+    api(project(":core:common"))
     implementation(project(":core:database"))
     implementation(project(":core:network"))
     implementation(libs.androidx.room.runtime)

@@ -1,5 +1,6 @@
 package com.lfgtavora.poketcg.feature.card_detail.impl.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,12 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -45,19 +50,23 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
+import com.lfgtavora.poketcg.core.common.SyncState
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAbility
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAttack
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAttackMinimal
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAttackNoDamage
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeCard
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeInfoChips
+import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeCardPreview
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeInfoChipsWrapping
 import com.lfgtavora.poketcg.model.data.Ability
 import com.lfgtavora.poketcg.model.data.Attack
 import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardPreview
 
 private const val CardAspectRatio = 2.5f / 3.5f
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun CardDetailScreen(
     onBack: () -> Unit,
@@ -68,6 +77,7 @@ fun CardDetailScreen(
     CardDetailScreen(
         uiState = uiState.value,
         onBack = onBack,
+        onRetry = viewModel::retry,
     )
 }
 
@@ -76,12 +86,20 @@ fun CardDetailScreen(
 fun CardDetailScreen(
     onBack: () -> Unit,
     uiState: CardDetailUiState,
+    onRetry: () -> Unit = {},
     previewHandler: AsyncImagePreviewHandler? = null,
 ) {
     CompositionLocalProvider(
         LocalAsyncImagePreviewHandler provides (previewHandler
             ?: LocalAsyncImagePreviewHandler.current)
     ) {
+
+        val name = when (val content = uiState.content) {
+            is Content.Partial -> content.card.name
+            is Content.Full -> content.card.name
+            else -> ""
+        }
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -94,9 +112,17 @@ fun CardDetailScreen(
                         }
                     },
                     title = {
-                        Text(
-                            text = (uiState as? CardDetailUiState.Success)?.card?.name.orEmpty()
-                        )
+                        Text(text = name)
+                    },
+                    actions = {
+                        if (uiState.isSyncing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .size(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        }
                     },
                 )
             },
@@ -107,41 +133,134 @@ fun CardDetailScreen(
                     .padding(paddingValues)
                     .testTag("card_detail"),
             ) {
-                when (uiState) {
-                    CardDetailUiState.Error -> {
-                        Text(
-                            text = "Failed to load card",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
-
-                    CardDetailUiState.Loading -> {
+                when (val content = uiState.content) {
+                    Content.Loading -> {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
 
-                    is CardDetailUiState.Success -> {
-                        val card = uiState.card
-                        if (card == null) {
-                            Text(
-                                text = "Card not found",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.align(Alignment.Center),
-                            )
-                        } else {
-                            CardDetailContent(card = card)
-                        }
+                    Content.Error -> {
+                        ErrorState(
+                            message = "Failed to load card",
+                            onRetry = onRetry,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(24.dp),
+                        )
+                    }
+
+                    Content.NotFound -> {
+                        Text(
+                            text = "Card not found",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
+
+                    is Content.Partial -> {
+                        CardDetailHydrating(
+                            preview = content.card,
+                            syncState = uiState.syncState,
+                            onRetry = onRetry
+                        )
+                    }
+
+                    is Content.Full -> {
+                        CardDetailContent(card = content.card)
                     }
                 }
             }
+
         }
     }
 }
 
 @Composable
-private fun CardDetailContent(card: Card) {
+private fun CardDetailHydrating(
+    preview: CardPreview,
+    syncState: SyncState,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        AsyncImage(
+            model = preview.image.small ?: preview.image.large,
+            contentDescription = preview.name,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .widthIn(max = 320.dp)
+                .fillMaxWidth()
+                .aspectRatio(CardAspectRatio),
+        )
+
+        Text(
+            text = preview.name,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+
+        when (syncState) {
+            SyncState.Syncing -> {
+                repeat(4) {
+                    SkeletonBox()
+                }
+            }
+
+            SyncState.Error -> {
+                ErrorState(
+                    message = "Failed to fetch card informations.",
+                    onRetry = onRetry,
+                )
+            }
+            else -> {}
+        }
+    }
+}
+
+@Composable
+private fun SkeletonBox(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray.copy(alpha = 0.35f)),
+    )
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(onClick = onRetry) {
+            Text(text = "Try again")
+        }
+    }
+}
+
+@Composable
+private fun CardDetailContent(
+    card: Card
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -410,35 +529,49 @@ private fun previewImageHandler() = AsyncImagePreviewHandler {
 private fun CardDetailSuccessPreview() {
     CardDetailScreen(
         onBack = {},
-        uiState = CardDetailUiState.Success(fakeCard),
+        uiState = CardDetailUiState(Content.Full(fakeCard), SyncState.Success),
         previewHandler = previewImageHandler(),
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Hydrating")
+@Composable
+private fun CardDetailHydratingPreview() {
+    CardDetailScreen(
+        onBack = {},
+        uiState = CardDetailUiState(Content.Partial(fakeCardPreview), SyncState.Syncing),
+        previewHandler = previewImageHandler(),
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
 @Preview(showBackground = true, name = "Screen – Loading")
 @Composable
 private fun CardDetailLoadingPreview() {
     CardDetailScreen(
         onBack = {},
-        uiState = CardDetailUiState.Loading,
+        uiState = CardDetailUiState(Content.Loading, SyncState.Syncing),
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Preview(showBackground = true, name = "Screen – Error")
 @Composable
 private fun CardDetailErrorPreview() {
     CardDetailScreen(
         onBack = {},
-        uiState = CardDetailUiState.Error,
+        uiState = CardDetailUiState(Content.Error, SyncState.Error),
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Preview(showBackground = true, name = "Screen – Not found")
 @Composable
 private fun CardDetailNotFoundPreview() {
     CardDetailScreen(
         onBack = {},
-        uiState = CardDetailUiState.Success(card = null),
+        uiState = CardDetailUiState(Content.NotFound, SyncState.Success),
     )
 }
 

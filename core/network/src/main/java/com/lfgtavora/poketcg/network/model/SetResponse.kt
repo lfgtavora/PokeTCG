@@ -4,7 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SetDataListResponse(
-    val data: List<SetResponse>
+    val data: List<SetResponse>,
+    val page: Int,
+    val pageSize: Int,
+    val count: Int,
+    val totalCount: Int
 )
 
 

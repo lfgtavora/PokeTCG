@@ -9,14 +9,13 @@ import com.lfgtavora.poketcg.database.dao.SetDao
 import com.lfgtavora.poketcg.database.dao.SetRemoteKeyDao
 import com.lfgtavora.poketcg.database.model.SetEntity
 import com.lfgtavora.poketcg.database.model.SetRemoteKeysEntity
-import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
-import java.io.IOException
+import com.lfgtavora.poketcg.network.model.SetDataListResponse
 
 @OptIn(ExperimentalPagingApi::class)
 internal class SetsRemoteMediator(
-    private val setDao: SetDao,
     private val setRemoteKeyDao: SetRemoteKeyDao,
-    private val network: TcgDexNetworkDataSource,
+    private val setDao: SetDao,
+    private val fetchNetWorkData: suspend (page: Int, pageSize: Int) -> Result<SetDataListResponse>,
     private val transactionRunner: TransactionRunner,
 ) : RemoteMediator<Int, SetEntity>() {
 
@@ -24,17 +23,20 @@ internal class SetsRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, SetEntity>
     ): MediatorResult {
+
         val page = when (loadType) {
             LoadType.REFRESH -> {
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
                 remoteKeys?.nextKey?.minus(1) ?: 1
             }
+
             LoadType.PREPEND -> {
                 val remoteKeys = getRemoteKeyForFirstItem(state)
                 val prevKey = remoteKeys?.prevKey
                     ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 prevKey
             }
+
             LoadType.APPEND -> {
                 val remoteKeys = getRemoteKeyForLastItem(state)
                 val nextKey = remoteKeys?.nextKey
@@ -43,31 +45,30 @@ internal class SetsRemoteMediator(
             }
         }
 
-        try {
-            val response = network.getSetsBrief(
-                page = page,
-                pageSize = state.config.pageSize,
-                orderBy = "-releaseDate",
-                field = "releaseDate"
-            )
-
-            val endOfPaginationReached = response.isEmpty()
-
-            transactionRunner {
-                val prevKey = if (page == 1) null else page - 1
-                val nextKey = if (endOfPaginationReached) null else page + 1
-                val keys = response.map {
-                    SetRemoteKeysEntity(setId = it.id, prevKey = prevKey, nextKey = nextKey)
-                }
-                setRemoteKeyDao.insertAll(keys)
-                setDao.insertMany(response.map { it.asEntity() })
-            }
-            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
-        } catch (exception: IOException) {
-            return MediatorResult.Error(exception)
-        } catch (exception: Exception) {
-            return MediatorResult.Error(exception)
+        val fetchNetWorkDataResult = fetchNetWorkData(
+            page,
+            state.config.pageSize
+        ).getOrElse {
+            return MediatorResult.Error(it)
         }
+
+        val endOfPaginationReached =
+            fetchNetWorkDataResult.count >= fetchNetWorkDataResult.totalCount
+
+        val prevKey = if (page == 1) null else page - 1
+        val nextKey = if (endOfPaginationReached) null else page + 1
+        val keys = fetchNetWorkDataResult.data.map {
+            SetRemoteKeysEntity(setId = it.id, prevKey = prevKey, nextKey = nextKey)
+        }
+
+        transactionRunner {
+            setRemoteKeyDao.insertAll(keys)
+            setDao.insertMany(
+                fetchNetWorkDataResult.data.map { it.asEntity() }
+            )
+        }
+
+        return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, SetEntity>): SetRemoteKeysEntity? {

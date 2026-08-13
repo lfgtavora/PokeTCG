@@ -23,6 +23,7 @@ private interface TcgDexNetworkApi {
     suspend fun getSets(
         @Query("page") page: Int,
         @Query("pageSize") itemsPerPage: Int,
+        @Query("select") select: String?,
         @Query("orderBy") orderBy: String? = null,
     ): SetDataListResponse
 
@@ -74,13 +75,17 @@ internal class TcgDexNetwork @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSetsBrief(
+    override suspend fun getSets(
         page: Int,
         pageSize: Int,
         orderBy: String?,
         field: String?
-    ): List<SetResponse> =
-        networkApi.getSets(page, pageSize, orderBy).data
+    ): SetDataListResponse =
+        networkApi.getSets(
+            page = page,
+            itemsPerPage = pageSize,
+            select = field
+        )
 
     override suspend fun getSet(id: String): SetResponse =
         networkApi.getSet(id)
@@ -99,7 +104,7 @@ internal class TcgDexNetwork @Inject constructor(
             query = query,
             page = page,
             itemsPerPage = pageSize,
-            select= select,
+            select = select,
             orderBy = orderBy
         )
 

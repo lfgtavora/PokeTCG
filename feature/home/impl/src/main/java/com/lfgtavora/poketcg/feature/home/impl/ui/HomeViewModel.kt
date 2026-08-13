@@ -4,32 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.lfgtavora.poketcg.data.repository.SetRepository
+import com.lfgtavora.poketcg.feature.home.api.ObservePaginatedSetsPreviewByLastReleaseDateUseCase
 import com.lfgtavora.poketcg.model.data.SetPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    setRepository: SetRepository
+    observePaginatedSetsPreviewByLastReleaseDateUseCase: ObservePaginatedSetsPreviewByLastReleaseDateUseCase
 ) : ViewModel() {
 
     val setsPagingData: Flow<PagingData<SetPreview>> =
-        setRepository.getSets()
+        observePaginatedSetsPreviewByLastReleaseDateUseCase()
             .cachedIn(viewModelScope)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = PagingData.empty()
-            )
-
-}
-
-sealed interface HomeUiState {
-    object Loading : HomeUiState
-    data class Success(val sets: List<SetPreview>) : HomeUiState
-    data object Error : HomeUiState
 }

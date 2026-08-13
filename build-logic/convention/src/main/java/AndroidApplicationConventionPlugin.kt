@@ -16,6 +16,7 @@
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.lfgtavora.poketcg.build_logic.convention.configureFlavors
 import com.lfgtavora.poketcg.build_logic.convention.configureGradleManagedDevices
 import com.lfgtavora.poketcg.build_logic.convention.configureKotlinAndroid
 import org.gradle.api.Plugin
@@ -32,6 +33,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
+                configureFlavors(this)
                 defaultConfig.targetSdk = 36
                 @Suppress("UnstableApiUsage")
                 testOptions.animationsDisabled = true

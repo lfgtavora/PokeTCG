@@ -15,12 +15,15 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -30,16 +33,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -57,6 +64,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +87,7 @@ import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeCardPreview
 import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeCardPreviewList
 import com.lfgtavora.poketcg.feature.sets.impl.preview.fakeSet
 import com.lfgtavora.poketcg.model.data.CardPreview
+import com.lfgtavora.poketcg.model.data.SetModel
 import com.lfgtavora.poketcg.ui.PokecardCard
 import kotlinx.coroutines.flow.flowOf
 
@@ -112,7 +121,11 @@ internal fun SetDetailScreen(
     onBack: () -> Unit = {},
     onItemClick: (id: String) -> Unit = {},
     previewHandler: AsyncImagePreviewHandler? = null,
+    initiallyShowSetInfo: Boolean = false,
 ) {
+    var showSetInfo by remember { mutableStateOf(initiallyShowSetInfo) }
+    val successSet = (setUiState as? SetUiState.Success)?.set
+
     CompositionLocalProvider(
         LocalAsyncImagePreviewHandler provides (previewHandler
             ?: LocalAsyncImagePreviewHandler.current)
@@ -136,17 +149,20 @@ internal fun SetDetailScreen(
                                 .padding(8.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (setUiState is SetUiState.Success) {
+                            if (successSet != null) {
                                 AsyncImage(
-                                    model = setUiState.set.logo,
-                                    contentDescription = setUiState.set.name,
+                                    model = successSet.logo,
+                                    contentDescription = successSet.name,
                                     modifier = Modifier.widthIn(max = 100.dp)
                                 )
                             }
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(
+                            onClick = { showSetInfo = true },
+                            enabled = successSet != null,
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Info,
                                 contentDescription = "information"
@@ -167,6 +183,147 @@ internal fun SetDetailScreen(
                 ),
             )
         }
+
+        if (showSetInfo && successSet != null) {
+            SetInfoBottomSheet(
+                set = successSet,
+                onDismiss = { showSetInfo = false },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SetInfoBottomSheet(
+    set: SetModel,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        SetInfoBottomSheetContent(set = set)
+    }
+}
+
+@Composable
+internal fun SetInfoBottomSheetContent(
+    set: SetModel,
+    modifier: Modifier = Modifier,
+) {
+    val legalityChips = buildList {
+        set.legalities?.standard?.takeIf { it.isNotBlank() }?.let { add("Standard: $it") }
+        set.legalities?.expanded?.takeIf { it.isNotBlank() }?.let { add("Expanded: $it") }
+        set.legalities?.unlimited?.takeIf { it.isNotBlank() }?.let { add("Unlimited: $it") }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 32.dp)
+            .testTag("set_info_bottom_sheet"),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            set.symbol?.let { symbol ->
+                AsyncImage(
+                    model = symbol,
+                    contentDescription = "${set.name} symbol",
+                    modifier = Modifier.size(40.dp),
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = set.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                set.series?.takeIf { it.isNotBlank() }?.let { series ->
+                    Text(
+                        text = series,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        set.logo?.let { logo ->
+            AsyncImage(
+                model = logo,
+                contentDescription = set.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetaRow(label = "Release date", value = set.releaseDate)
+            MetaRow(label = "Printed total", value = set.printedTotal.toString())
+            MetaRow(label = "Total cards", value = set.total.toString())
+            set.ptcgoCode?.takeIf { it.isNotBlank() }?.let { code ->
+                MetaRow(label = "PTCGO code", value = code)
+            }
+            set.updatedAt?.takeIf { it.isNotBlank() }?.let { updatedAt ->
+                MetaRow(label = "Updated at", value = updatedAt)
+            }
+        }
+
+        if (legalityChips.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                HorizontalDivider()
+                Text(
+                    text = "Legalities",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    legalityChips.forEach { chip ->
+                        AssistChip(
+                            onClick = {},
+                            enabled = false,
+                            label = { Text(chip) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MetaRow(
+    label: String,
+    value: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+        )
     }
 }
 
@@ -434,6 +591,49 @@ private fun SetDetailSuccessPreview() {
         cardsPagingItems = rememberPreviewPagingItems(data = fakeCardPreviewList),
         previewHandler = previewImageHandler(),
     )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "Screen – Success + Info sheet")
+@Composable
+private fun SetDetailWithInfoSheetPreview() {
+    SetDetailScreen(
+        setUiState = SetUiState.Success(fakeSet),
+        cardsPagingItems = rememberPreviewPagingItems(data = fakeCardPreviewList),
+        previewHandler = previewImageHandler(),
+        initiallyShowSetInfo = true,
+    )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "SetInfoBottomSheetContent")
+@Composable
+private fun SetInfoBottomSheetContentPreview() {
+    CompositionLocalProvider(
+        LocalAsyncImagePreviewHandler provides previewImageHandler()
+    ) {
+        SetInfoBottomSheetContent(set = fakeSet)
+    }
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Preview(showBackground = true, name = "SetInfoBottomSheetContent – minimal")
+@Composable
+private fun SetInfoBottomSheetContentMinimalPreview() {
+    CompositionLocalProvider(
+        LocalAsyncImagePreviewHandler provides previewImageHandler()
+    ) {
+        SetInfoBottomSheetContent(
+            set = fakeSet.copy(
+                series = null,
+                ptcgoCode = null,
+                updatedAt = null,
+                symbol = null,
+                logo = null,
+                legalities = null,
+            )
+        )
+    }
 }
 
 @OptIn(ExperimentalCoilApi::class)

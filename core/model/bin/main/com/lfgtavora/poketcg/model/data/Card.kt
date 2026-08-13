@@ -28,6 +28,7 @@ data class Card(
     val abilities: List<Ability>? = null,
     val ancientTrait: AncientTrait? = null,
     val legalities: Legalities? = null,
+    val lastFullSyncAt: Long? = null
 )
 
 data class Attack(

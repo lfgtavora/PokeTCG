@@ -6,6 +6,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
+import com.lfgtavora.poketcg.core.common.RetryPolicy
+import com.lfgtavora.poketcg.core.common.suspendRunCatching
+import com.lfgtavora.poketcg.core.common.withRetry
 import com.lfgtavora.poketcg.data.di.IoDispatcher
 import com.lfgtavora.poketcg.data.mapper.asEntity
 import com.lfgtavora.poketcg.data.mediator.CardsRemoteMediator
@@ -16,13 +19,15 @@ import com.lfgtavora.poketcg.database.model.CardEntity
 import com.lfgtavora.poketcg.database.model.asCard
 import com.lfgtavora.poketcg.database.model.asCardPreview
 import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardLookup
 import com.lfgtavora.poketcg.model.data.CardPreview
 import com.lfgtavora.poketcg.network.TcgDexNetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class OfflineFirstCardRepository @Inject constructor(
@@ -65,15 +70,26 @@ class OfflineFirstCardRepository @Inject constructor(
         }
     }
 
-    override fun getCard(id: String): Flow<Card?> =
+    override fun observeCard(id: String): Flow<CardLookup?> =
         cardDao.getCardById(id)
-            .map { it?.asCard() }
-            .onStart { refreshCard(id) }
+            .map { entity ->
+                when {
+                    entity == null -> null
+                    entity.lastFullSyncAt != null -> CardLookup.Full(entity.asCard())
+                    else -> CardLookup.Partial(entity.asCardPreview())
+                }
+            }
             .flowOn(ioDispatcher)
 
-    private suspend fun refreshCard(id: String) {
-        val card = remoteDataSource.getCard(id).data
-        card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
-        cardDao.upsert(card.asEntity())
-    }
+    override suspend fun syncCard(
+        id: String,
+        retryPolicy: RetryPolicy
+    ) =
+        withContext(ioDispatcher) {
+            suspendRunCatching {
+                val card = withRetry(retryPolicy) { remoteDataSource.getCard(id).data }
+                card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
+                cardDao.upsert(card.asEntity())
+            }
+        }
 }

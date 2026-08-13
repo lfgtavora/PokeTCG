@@ -48,6 +48,7 @@ android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-paging-common = {group = "androidx.paging", name= "paging-common", version.ref = "androidxPaging"}
 androidx-paging-runtime = {group = "androidx.paging", name= "paging-runtime", version.ref = "androidxPaging"}
 androidx-paging-compose = {group = "androidx.paging", name= "paging-compose", version.ref = "androidxPagingCompose"}
 androidx-palette = {group = "androidx.palette", name= "palette-ktx", version.ref = "androidxPalette"}
@@ -102,6 +103,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }

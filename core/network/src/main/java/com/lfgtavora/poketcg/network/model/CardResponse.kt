@@ -13,7 +13,8 @@ data class CardDataListResponse(
 
 @Serializable
 data class CardDataResponse(
-    val data: CardResponse
+    val data: CardResponse,
+    val status: String? = null
 )
 
 @Serializable

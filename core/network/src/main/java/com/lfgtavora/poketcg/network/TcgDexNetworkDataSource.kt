@@ -3,17 +3,18 @@ package com.lfgtavora.poketcg.network
 import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse
 import com.lfgtavora.poketcg.network.model.SearchDataResponse
+import com.lfgtavora.poketcg.network.model.SetDataListResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 
 interface TcgDexNetworkDataSource {
     suspend fun getAllSets(): List<SetResponse>
 
-    suspend fun getSetsBrief(
+    suspend fun getSets(
         page: Int,
         pageSize: Int,
         orderBy: String? = null,
         field: String? = null,
-    ): List<SetResponse>
+    ): SetDataListResponse
 
     suspend fun getSet(id: String): SetResponse
     suspend fun getCard(id: String): CardDataResponse

@@ -15,6 +15,7 @@
  */
 
 import com.android.build.api.dsl.LibraryExtension
+import com.lfgtavora.poketcg.build_logic.convention.configureFlavors
 import com.lfgtavora.poketcg.build_logic.convention.configureGradleManagedDevices
 import com.lfgtavora.poketcg.build_logic.convention.configureKotlinAndroid
 import com.lfgtavora.poketcg.build_logic.convention.libs
@@ -38,7 +39,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 defaultConfig.targetSdk = 36
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 testOptions.animationsDisabled = true
-                //configureFlavors(this)
+                configureFlavors(this)
                 configureGradleManagedDevices(this)
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"

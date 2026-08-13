@@ -3,6 +3,8 @@ package com.lfgtavora.poketcg.feature.card_detail.impl.preview
 import com.lfgtavora.poketcg.model.data.Ability
 import com.lfgtavora.poketcg.model.data.Attack
 import com.lfgtavora.poketcg.model.data.Card
+import com.lfgtavora.poketcg.model.data.CardPreview
+import com.lfgtavora.poketcg.model.data.CardPreviewImage
 import com.lfgtavora.poketcg.model.data.Legalities
 import com.lfgtavora.poketcg.model.data.Resistance
 import com.lfgtavora.poketcg.model.data.Weakness
@@ -84,4 +86,14 @@ internal val fakeCard = Card(
     legalities = Legalities(
         unlimited = "Legal",
     ),
+)
+
+internal val fakeCardPreview = CardPreview(
+    id = fakeCard.id,
+    name = fakeCard.name,
+    image = CardPreviewImage(
+        small = fakeCard.imageSmall,
+        large = fakeCard.imageLarge,
+    ),
+    setId = fakeCard.setId,
 )

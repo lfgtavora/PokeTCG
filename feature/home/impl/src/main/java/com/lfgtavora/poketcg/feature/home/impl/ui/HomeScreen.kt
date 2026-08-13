@@ -142,10 +142,22 @@ internal fun HomeScreen(
         }
 
         if (lazyPagingItems.loadState.refresh is LoadState.Error && lazyPagingItems.itemCount == 0) {
-            Text(
-                text = "Erro ao carregar os dados",
-                modifier = Modifier.align(Alignment.Center)
-            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Erro ao carregar os dados",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Button(onClick = { lazyPagingItems.retry() }) {
+                    Text(text = "Tentar novamente")
+                }
+            }
         }
     }
 }
@@ -301,6 +313,3 @@ private fun HomeScreenErrorPreview() {
         }
     )
 }
-
-
-

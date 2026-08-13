@@ -20,7 +20,7 @@ import com.lfgtavora.poketcg.database.model.SetRemoteKeysEntity
         SetRemoteKeysEntity::class,
         CardRemoteKeysEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 @TypeConverters(CardTypeConverters::class)

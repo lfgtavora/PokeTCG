@@ -71,5 +71,9 @@ gradlePlugin {
             id = libs.plugins.poketcg.android.room.get().pluginId
             implementationClass = "AndroidRoomConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = libs.plugins.poketcg.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }
