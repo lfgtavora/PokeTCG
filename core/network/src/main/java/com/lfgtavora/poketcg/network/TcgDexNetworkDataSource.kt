@@ -4,6 +4,7 @@ import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse
 import com.lfgtavora.poketcg.network.model.SearchDataResponse
 import com.lfgtavora.poketcg.network.model.SetDataListResponse
+import com.lfgtavora.poketcg.network.model.SetDataResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 
 interface TcgDexNetworkDataSource {
@@ -16,7 +17,7 @@ interface TcgDexNetworkDataSource {
         field: String? = null,
     ): SetDataListResponse
 
-    suspend fun getSet(id: String): SetResponse
+    suspend fun getSet(id: String): SetDataResponse
     suspend fun getCard(id: String): CardDataResponse
 
     suspend fun getCards(

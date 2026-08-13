@@ -52,7 +52,7 @@ class OfflineFirstSetRepository @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = pageSize,
-                enablePlaceholders = true
+                enablePlaceholders = false,
             ),
             remoteMediator = SetsRemoteMediator(
                 setRemoteKeyDao = setRemoteKeyDao,
@@ -68,6 +68,7 @@ class OfflineFirstSetRepository @Inject constructor(
                 transactionRunner = { block ->
                     database.withTransaction { block() }
                 },
+                crashlytics = crashlytics
             ),
             pagingSourceFactory = { setDao.pagingSource() }
         ).flow.map { pagingData ->
@@ -107,7 +108,7 @@ class OfflineFirstSetRepository @Inject constructor(
     ): Result<Unit> =
         withContext(ioDispatcher) {
             suspendRunCatching {
-                val setResponse = withRetry(retryPolicy) { network.getSet(id) }
+                val setResponse = withRetry(retryPolicy) { network.getSet(id).data }
                 setDao.insert(setResponse.asEntity())
             }.onFailure { throwable ->
                 if (throwable !is IOException) {

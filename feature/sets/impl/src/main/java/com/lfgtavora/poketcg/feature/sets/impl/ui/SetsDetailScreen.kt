@@ -102,14 +102,17 @@ internal fun SetsDetailsScreen(
     onBack: () -> Unit = {},
     onItemClick: (id: String) -> Unit = {}
 ) {
-    val setUiState = viewModel.setUiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cardsPagingItems = viewModel.cardsPagingData.collectAsLazyPagingItems()
 
     SetDetailScreen(
-        setUiState = setUiState.value,
+        setUiState = uiState.setState,
+        showSetInfo = uiState.showSetInfo,
         cardsPagingItems = cardsPagingItems,
         onBack = onBack,
-        onItemClick = onItemClick
+        onItemClick = onItemClick,
+        onSetInfoClick = viewModel::onSetInfoClicked,
+        onSetInfoDismiss = viewModel::onSetInfoDismissed,
     )
 }
 
@@ -120,11 +123,13 @@ internal fun SetDetailScreen(
     cardsPagingItems: LazyPagingItems<CardPreview>,
     onBack: () -> Unit = {},
     onItemClick: (id: String) -> Unit = {},
+    onSetInfoClick: () -> Unit = {},
+    onSetInfoDismiss: () -> Unit = {},
+    showSetInfo: Boolean = false,
     previewHandler: AsyncImagePreviewHandler? = null,
-    initiallyShowSetInfo: Boolean = false,
 ) {
-    var showSetInfo by remember { mutableStateOf(initiallyShowSetInfo) }
     val successSet = (setUiState as? SetUiState.Success)?.set
+
 
     CompositionLocalProvider(
         LocalAsyncImagePreviewHandler provides (previewHandler
@@ -160,7 +165,7 @@ internal fun SetDetailScreen(
                     },
                     actions = {
                         IconButton(
-                            onClick = { showSetInfo = true },
+                            onClick = onSetInfoClick,
                             enabled = successSet != null,
                         ) {
                             Icon(
@@ -187,7 +192,7 @@ internal fun SetDetailScreen(
         if (showSetInfo && successSet != null) {
             SetInfoBottomSheet(
                 set = successSet,
-                onDismiss = { showSetInfo = false },
+                onDismiss = onSetInfoDismiss,
             )
         }
     }
@@ -601,7 +606,7 @@ private fun SetDetailWithInfoSheetPreview() {
         setUiState = SetUiState.Success(fakeSet),
         cardsPagingItems = rememberPreviewPagingItems(data = fakeCardPreviewList),
         previewHandler = previewImageHandler(),
-        initiallyShowSetInfo = true,
+        showSetInfo = true,
     )
 }
 

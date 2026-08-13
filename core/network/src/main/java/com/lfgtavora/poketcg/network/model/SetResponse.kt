@@ -11,6 +11,10 @@ data class SetDataListResponse(
     val totalCount: Int
 )
 
+@Serializable
+data class SetDataResponse(
+    val data: SetResponse
+)
 
 @Serializable
 data class SetResponse(

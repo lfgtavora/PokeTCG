@@ -95,7 +95,6 @@ class OfflineFirstCardRepository @Inject constructor(
                 card.set?.let { setDao.insertIfAbsent(it.asEntity()) }
                 cardDao.upsert(card.asEntity())
             }.onFailure { throwable ->
-                if (throwable !is IOException) {
                     crashlytics.recordException(
                         throwable = throwable,
                         extras = mapOf(
@@ -104,6 +103,5 @@ class OfflineFirstCardRepository @Inject constructor(
                         ),
                     )
                 }
-            }
         }
 }

@@ -6,6 +6,7 @@ import com.lfgtavora.poketcg.network.model.CardDataListResponse
 import com.lfgtavora.poketcg.network.model.CardDataResponse
 import com.lfgtavora.poketcg.network.model.SearchDataResponse
 import com.lfgtavora.poketcg.network.model.SetDataListResponse
+import com.lfgtavora.poketcg.network.model.SetDataResponse
 import com.lfgtavora.poketcg.network.model.SetResponse
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -28,7 +29,9 @@ private interface TcgDexNetworkApi {
     ): SetDataListResponse
 
     @GET("sets/{id}")
-    suspend fun getSet(id: String): SetResponse
+    suspend fun getSet(
+        @Path("id") id: String
+    ): SetDataResponse
 
     @GET("cards")
     suspend fun getCards(
@@ -84,10 +87,11 @@ internal class TcgDexNetwork @Inject constructor(
         networkApi.getSets(
             page = page,
             itemsPerPage = pageSize,
-            select = field
+            select = field,
+            orderBy = orderBy,
         )
 
-    override suspend fun getSet(id: String): SetResponse =
+    override suspend fun getSet(id: String): SetDataResponse =
         networkApi.getSet(id)
 
     override suspend fun getCard(id: String): CardDataResponse =
