@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -128,7 +129,7 @@ internal fun SetDetailScreen(
     showSetInfo: Boolean = false,
     previewHandler: AsyncImagePreviewHandler? = null,
 ) {
-    val successSet = (setUiState as? SetUiState.Success)?.set
+    val set = (setUiState as? SetUiState.Success)?.set
 
 
     CompositionLocalProvider(
@@ -154,24 +155,25 @@ internal fun SetDetailScreen(
                                 .padding(8.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (successSet != null) {
+                            if (set != null) {
                                 AsyncImage(
-                                    model = successSet.logo,
-                                    contentDescription = successSet.name,
+                                    model = set.logo,
+                                    contentDescription = set.name,
                                     modifier = Modifier.widthIn(max = 100.dp)
                                 )
                             }
                         }
                     },
                     actions = {
-                        IconButton(
-                            onClick = onSetInfoClick,
-                            enabled = successSet != null,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = "information"
-                            )
+                        if (set != null) {
+                            IconButton(
+                                onClick = onSetInfoClick,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = "information",
+                                )
+                            }
                         }
                     }
                 )
@@ -189,9 +191,9 @@ internal fun SetDetailScreen(
             )
         }
 
-        if (showSetInfo && successSet != null) {
+        if (showSetInfo && set != null) {
             SetInfoBottomSheet(
-                set = successSet,
+                set = set,
                 onDismiss = onSetInfoDismiss,
             )
         }
@@ -383,7 +385,11 @@ fun PokeCardList(
 
                     val isSelected = card.id == selectedCard?.id
 
-                    Box(modifier = Modifier.alpha(if (isSelected) 0f else 1f)) {
+                    Box(
+                        modifier = Modifier
+                            .alpha(if (isSelected) 0f else 1f)
+                            .testTag("card_pos_$index")
+                    ) {
                         PokecardCard(
                             id = card.id,
                             name = card.name,

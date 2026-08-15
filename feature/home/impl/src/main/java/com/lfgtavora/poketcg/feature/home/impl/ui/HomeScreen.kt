@@ -95,14 +95,16 @@ internal fun HomeScreen(
                 contentType = { lazyPagingItems.itemContentType { "SetPreview" } }
             ) { index ->
                 lazyPagingItems[index]?.let { setData ->
-                    SetCardView(
-                        id = setData.id,
-                        name = setData.name,
-                        imageUrl = setData.logo,
-                        totalCards = setData.totalCards,
-                        onClick = { onSetClick(setData.id) },
-                        previewHandler = previewHandler
-                    )
+                    Box(modifier = Modifier.testTag("home_set_pos_$index")) {
+                        SetCardView(
+                            id = setData.id,
+                            name = setData.name,
+                            imageUrl = setData.logo,
+                            totalCards = setData.totalCards,
+                            onClick = { onSetClick(setData.id) },
+                            previewHandler = previewHandler
+                        )
+                    }
                 }
             }
 

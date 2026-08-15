@@ -1,4 +1,4 @@
-appId: com.lfgtavora.poketcg
+appId: com.lfgtavora.poketcg.demo
 ---
 - launchApp
 - extendedWaitUntil:
@@ -20,8 +20,7 @@ appId: com.lfgtavora.poketcg
     timeout: 30000
 - scrollUntilVisible:
     element:
-      id: "card_preview_.*"
-      index: 8
+      id: "card_pos_20"
     direction: DOWN
     timeout: 30000
 - assertVisible:

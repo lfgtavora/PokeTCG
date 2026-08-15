@@ -1,4 +1,4 @@
-appId: com.lfgtavora.poketcg
+appId: com.lfgtavora.poketcg.demo
 ---
 - launchApp
 - extendedWaitUntil:

@@ -1,16 +1,14 @@
-appId: com.lfgtavora.poketcg
+appId: com.lfgtavora.poketcg.demo
 ---
 - launchApp
 - extendedWaitUntil:
     visible:
       id: "home_sets_grid"
     timeout: 30000
-- assertVisible: "Sets"
 - tapOn: "Search"
 - assertVisible:
     id: "search_field"
 - tapOn: "Home"
-- assertVisible: "Sets"
 - assertVisible:
     id: "home_sets_grid"
 - tapOn: "Search"

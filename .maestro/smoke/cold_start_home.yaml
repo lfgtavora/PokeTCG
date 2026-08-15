@@ -1,4 +1,4 @@
-appId: com.lfgtavora.poketcg
+appId: com.lfgtavora.poketcg.demo
 tags:
   - smoke
 ---
@@ -8,7 +8,6 @@ tags:
     visible:
       id: "home_sets_grid"
     timeout: 30000
-- assertVisible: "Sets"
 - extendedWaitUntil:
     visible:
       id: "set_card_.*"

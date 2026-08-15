@@ -68,7 +68,7 @@ Gradle then maps source sets 1:1:
 
 `src/demo` and `src/prod` can contain classes with the **same fully-qualified name**. Gradle includes only one of them per variant, so there is never a clash. That is how we ship two `AnalyticsModule` classes without `if`/`when` on flavor.
 
-You can also declare flavor-scoped dependencies (`prodImplementation`, `demoImplementation`). Firebase belongs on `prod` only — it should not land in demo APKs. Those lines are currently commented in `build.gradle.kts` until Firebase is wired for real.
+You can also declare flavor-scoped dependencies (`prodImplementation`, `demoImplementation`). Firebase belongs on `prod` only — it should not land in demo APKs. `prodImplementation` for the BOM + `firebase-analytics` is already on.
 
 ### Why this is a solid swap strategy
 
@@ -167,6 +167,65 @@ Call it from the ViewModel or `LocalAnalyticsHelper.current`. `FirebaseAnalytics
 
 Only put a generic type in `AnalyticsEvent.Types` if the event is truly transversal (e.g. Firebase `select_content` with `content_type` / `item_id`). Prefer named feature events for funnels. Do not wrap every `onClick` — track actions you will actually look at.
 
+## Debugging prod events (Firebase DebugView)
+
+`prodReleaseLocal` / `prodRelease` talk to Firebase. `demo*` never does (`StubAnalyticsHelper` → logcat). Both APKs can sit on the same emulator (`com.lfgtavora.poketcg` vs `com.lfgtavora.poketcg.demo`). Clicking the demo icon looks identical and ships **nothing**.
+
+Do not use Analytics → Events. That report is ~24h delayed. Crashlytics showing a user is also not this — different product.
+
+`releaseLocal` is `initWith(release)`: minify on, not debuggable. DebugView does **not** attach until you set the debug prop **and cold-start** the process. Setting the prop while the app is already running is a no-op until you force-stop / reopen.
+
+### One-time: adb on PATH
+
+The binary is already in the Android SDK. Put this in `~/.zshrc` and `source ~/.zshrc`:
+
+```bash
+export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
+```
+
+### Console (do this first)
+
+1. Firebase → ⚙️ Project settings → Integrations → **Google Analytics** must be Enabled, property linked to **poketcg-7a44a** (project number `17259778241`).
+2. Open DebugView in **GA4** (`analytics.google.com`), not the Firebase embed. Search box → **DebugView** (or Admin → Data display → DebugView).
+3. GA4 → Admin → Data filters → Internal traffic: state **Testing / Teste**, not Active / Ativo. **Exclude / Excluir** is the rule action — that is fine. Active is what drops DebugView.
+4. Chrome incognito, no uBlock. Adblock kills the DebugView websocket.
+5. Leave DebugView **open**. Device dropdown is on the **left**. Emulator shows up as `sdk_gphone64_arm64`. The list stays “No devices” until an event arrives with the page already connected.
+
+### Device
+
+```bash
+adb shell setprop log.tag.FA VERBOSE
+adb shell setprop log.tag.FA-SVC VERBOSE
+adb shell setprop debug.firebase.analytics.app com.lfgtavora.poketcg
+
+adb shell am force-stop com.lfgtavora.poketcg.demo
+adb shell am force-stop com.lfgtavora.poketcg
+```
+
+Reopen **prod** from the launcher (or Android Studio Run on `prodReleaseLocal`). Force-stop + open is what actually attaches the device in DebugView.
+
+```bash
+adb logcat -s FA FA-SVC StubAnalyticsHelper
+```
+
+Trigger the action (e.g. set info → `set_info_clicked`), then send the app to background so the SDK flushes.
+
+Healthy FA-SVC lines:
+
+- `Logging event: origin=app,name=set_info_clicked`
+- param `_dbg` = `1`
+- `Network upload successful ... 204`
+
+`StubAnalyticsHelper: Received analytics event` = you are on the demo APK. Stop. Wrong icon.
+
+Disable when done:
+
+```bash
+adb shell setprop debug.firebase.analytics.app .none.
+```
+
+Custom params (`set_id`, etc.) show in DebugView immediately. They do **not** show in standard GA4 reports until you register a custom dimension.
+
 ## Mental model
 
 ```
@@ -185,6 +244,6 @@ Gradle picks the source set. Hilt picks the binding. Features never see either d
 
 This module is copied from [Now in Android (NIA)](https://github.com/android/nowinandroid) (`core:analytics`), including the flavor split, Hilt modules, event model, and Compose local.
 
-NIA's version is the right default for ~99% of apps. There is no reason to fork the design: interface + flavor source sets + `@Binds` already covers production, demo, tests, and previews. When we eventually enable Firebase, we uncomment `prodImplementation` and keep the rest as-is.
+NIA's version is the right default for ~99% of apps. There is no reason to fork the design: interface + flavor source sets + `@Binds` already covers production, demo, tests, and previews. Firebase is wired on `prod` via `prodImplementation`; keep call sites on `AnalyticsHelper`.
 
 If you are learning this repo, treat this module as a reference implementation of **flavor-based dependency substitution**, not as a unique analytics product.

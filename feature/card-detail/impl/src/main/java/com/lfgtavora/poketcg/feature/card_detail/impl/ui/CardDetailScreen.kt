@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
 import com.lfgtavora.poketcg.core.common.SyncState
+import com.lfgtavora.poketcg.core.ui.R
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAbility
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAttack
 import com.lfgtavora.poketcg.feature.card_detail.impl.preview.fakeAttackMinimal
@@ -194,6 +196,8 @@ private fun CardDetailHydrating(
             model = preview.image.small ?: preview.image.large,
             contentDescription = preview.name,
             contentScale = ContentScale.Fit,
+            placeholder = painterResource(R.drawable.card_back),
+            error = painterResource(R.drawable.card_back),
             modifier = Modifier
                 .widthIn(max = 320.dp)
                 .fillMaxWidth()
@@ -273,6 +277,8 @@ private fun CardDetailContent(
             model = card.imageLarge ?: card.imageSmall,
             contentDescription = card.name,
             contentScale = ContentScale.Fit,
+            placeholder = painterResource(R.drawable.card_back),
+            error = painterResource(R.drawable.card_back),
             modifier = Modifier
                 .widthIn(max = 320.dp)
                 .fillMaxWidth()
